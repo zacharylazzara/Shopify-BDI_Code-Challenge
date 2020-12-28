@@ -5,7 +5,7 @@ var storage = firebase.storage();
 var imagesRef = storage.ref("images")
 
 var publicRef = imagesRef.child("public");
-var privateRef;
+var privateRef; // Assigned in initialize()
 var privateImages = [];
 var publicImages = [];
 
@@ -36,35 +36,46 @@ var imageConverter = {
             owner: image.owner
         }
     },
-
     fromFirestore: (snapshot, options) => {
         const data = snapshot.data(options);
         return new Image(data.filename, data.metadata, data.permission, data.src, data.uploadDate, data.owner);
     }
 };
 
-function uploadImage(permission = permissions.PRIVATE) {
+document.getElementById("uploadBtn").addEventListener("click", () => {
     if (user) {
         document.getElementById("upload").files.forEach(file => {
+            var permission = permissions.PRIVATE;
+
+            if (document.getElementById("permission").value == permissions.PUBLIC) {
+                permission = permissions.PUBLIC;
+            }
+
             var image = new Image(file.name, file.type, permission);
             saveImage(image, file);
         });
     } else {
         throw "User must be logged in to upload images!";
     }
-}
+});
 
 function saveImage(image, file) {
     if (user) {
-        var uploadTask;
+        var uploadTask = privateRef.child(image.filename);
 
-        switch(image.permission) {
-            case permissions.PUBLIC:
-                uploadTask = publicRef.child(image.filename).put(file, file.type);
-            break;
-            default:
-                uploadTask = privateRef.child(image.filename).put(file, file.type);
+        if (image.permission === permissions.PUBLIC) {
+            uploadTask = publicRef.child(image.filename);
         }
+
+        uploadTask.put(file, file.type);
+
+        // switch(image.permission) {
+        //     case permissions.PUBLIC:
+        //         uploadTask = publicRef.child(image.filename).put(file, file.type);
+        //     break;
+        //     default:
+        //         uploadTask = privateRef.child(image.filename).put(file, file.type);
+        // }
 
         uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, snapshot => { // Upload in progress
             console.info("Upload Progress: ${(snapshot.bytesTransferred / snapshot.totalBytes) * 100}%");
@@ -92,15 +103,19 @@ function saveImage(image, file) {
 
 function deleteImage(image) {
     if (user) {
-        var deleteRef;
+        var deleteRef = privateRef.child(image.filename);
 
-        switch(image.permission) {
-            case permissions.PUBLIC:
-                deleteRef = publicRef.child(image.filename);
-            break;
-            default:
-                deleteRef = privateRef.child(image.filename);
+        if (image.permission === permissions.PUBLIC) {
+            deleteRef = publicRef.child(image.filename);
         }
+
+        // switch(image.permission) {
+        //     case permissions.PUBLIC:
+        //         deleteRef = publicRef.child(image.filename);
+        //     break;
+        //     default:
+        //         deleteRef = privateRef.child(image.filename);
+        // }
 
         // TODO: if db throws an error then we need to restore the image, since it'll be out of sync otherwise
 
