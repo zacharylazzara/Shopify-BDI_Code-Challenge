@@ -188,7 +188,24 @@ function initialize() {
     firebase.auth().onAuthStateChanged(() => {
         if (user) {
             privateRef = imagesRef.child(user.uid);
+            document.getElementById("authBtn").textContent = "Logout"
             displayPrivateImages();
+        } else {
+            document.getElementById("authBtn").textContent = "Login"
         }
     });
 }
+
+document.getElementById("authBtn").addEventListener("click", () => {
+    if (user) {
+        logout();
+    } else {
+        login();
+    }
+});
+
+document.getElementById("upload").addEventListener("change", () => {
+    var filename = document.getElementById("upload").files[0].name;
+    // TODO: count extra files and display "filename + 5 more" for example
+    document.getElementById("upload-label").textContent = filename;
+});
