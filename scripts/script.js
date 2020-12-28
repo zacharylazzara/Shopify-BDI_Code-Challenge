@@ -173,17 +173,15 @@ function displayPublicImages() {
 }
 
 function initialize() {
+    firebase.auth().getRedirectResult().then(result => {
+        console.info(`Redirect Result: ${result}`);
+        console.info(`Got User: ${result.user}`);
+        user = result.user;
+    }).catch(error => console.error(error.message));
+
     displayPublicImages();
 
     firebase.auth().onAuthStateChanged(() => {
-        firebase.auth().getRedirectResult().then(result => {
-            console.info(`Redirect Result: ${result}`);
-            console.info(`Got User: ${result.user}`);
-            user = result.user;
-        }).catch(error => console.error(error.message));
-
-        console.info(`User: ${user}`);
-
         if (user) {
             privateRef = imagesRef.child(user.uid);
             document.getElementById("authBtn").textContent = "Logout"
