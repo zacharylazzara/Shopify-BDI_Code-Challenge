@@ -175,7 +175,7 @@ function displayPublicImages() {
 function initialize() {
     firebase.auth().getRedirectResult().then(result => {
         user = result.user;
-        console.info(`User: ${user.displayName}, UID: ${user.uid}`);
+        console.info(`User: ${user.displayName ?? "N/A"}, UID: ${user.uid ?? "N/A"}`);
     }).catch(error => console.error(error.message));
 
     displayPublicImages();
