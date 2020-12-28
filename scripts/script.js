@@ -43,21 +43,6 @@ var imageConverter = {
     }
 };
 
-function login() {
-    firebase.auth().signInWithRedirect(provider).catch(error => console.error(error.message));
-    firebase.auth().getRedirectResult().then(result => {
-        console.info(`Redirect Result: ${result}`);
-        console.info(`Got User: ${result.user}`);
-        user = result.user;
-    }).catch(error => console.error(error.message));
-}
-
-function logout() {
-    firebase.auth().signOut().then(function() {
-        location.reload(); // Refresh the page to clear everything and reinitialize
-    }).catch(error => console.error(error.message));
-}
-
 function uploadImage(permission = permissions.PRIVATE) {
     if (user) {
         document.getElementById("upload").files.forEach(file => {
@@ -191,7 +176,14 @@ function initialize() {
     displayPublicImages();
 
     firebase.auth().onAuthStateChanged(() => {
+        firebase.auth().getRedirectResult().then(result => {
+            console.info(`Redirect Result: ${result}`);
+            console.info(`Got User: ${result.user}`);
+            user = result.user;
+        }).catch(error => console.error(error.message));
+
         console.info(`User: ${user}`);
+
         if (user) {
             privateRef = imagesRef.child(user.uid);
             document.getElementById("authBtn").textContent = "Logout"
@@ -204,9 +196,11 @@ function initialize() {
 
 document.getElementById("authBtn").addEventListener("click", () => {
     if (user) {
-        logout();
+        firebase.auth().signOut().then(function() {
+            location.reload(); // Refresh the page to clear everything and reinitialize
+        }).catch(error => console.error(error.message));
     } else {
-        login();
+        firebase.auth().signInWithRedirect(provider).catch(error => console.error(error.message));
     }
 });
 
