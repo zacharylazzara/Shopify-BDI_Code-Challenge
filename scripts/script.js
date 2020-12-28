@@ -44,16 +44,15 @@ var imageConverter = {
 
 document.getElementById("uploadBtn").addEventListener("click", () => {
     if (user) {
-        document.getElementById("upload").files.forEach(file => {
-            var permission = permissions.PRIVATE;
+        file = document.getElementById("upload").files[0];
+        var permission = permissions.PRIVATE;
 
-            if (document.getElementById("permission").value == permissions.PUBLIC) {
-                permission = permissions.PUBLIC;
-            }
+        if (document.getElementById("permission").value == permissions.PUBLIC) {
+            permission = permissions.PUBLIC;
+        }
 
-            var image = new Image(file.name, file.type, permission);
-            saveImage(image, file);
-        });
+        var image = new Image(file.name, file.type, permission);
+        saveImage(image, file);
     } else {
         throw "User must be logged in to upload images!";
     }
@@ -221,6 +220,5 @@ document.getElementById("authBtn").addEventListener("click", () => {
 
 document.getElementById("upload").addEventListener("change", () => {
     var filename = document.getElementById("upload").files[0].name;
-    // TODO: count extra files and display "filename + 5 more" for example
     document.getElementById("upload-label").textContent = filename;
 });
