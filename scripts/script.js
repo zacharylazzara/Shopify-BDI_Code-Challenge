@@ -44,7 +44,10 @@ var imageConverter = {
 };
 
 function login() {
-    firebase.auth().signInWithRedirect(provider).then(console.info("Login")).catch(error => console.error(error.message));
+    firebase.auth().signInWithRedirect(provider).catch(error => console.error(error.message));
+    firebase.auth().getRedirectResult().then(result => {
+        user = result.user;
+    }).catch(error => console.error(error.message));
 }
 
 function logout() {
