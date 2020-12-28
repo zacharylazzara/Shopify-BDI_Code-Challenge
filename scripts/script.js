@@ -46,6 +46,8 @@ var imageConverter = {
 function login() {
     firebase.auth().signInWithRedirect(provider).catch(error => console.error(error.message));
     firebase.auth().getRedirectResult().then(result => {
+        console.info(`Redirect Result: ${result}`);
+        console.info(`Got User: ${result.user}`);
         user = result.user;
     }).catch(error => console.error(error.message));
 }
