@@ -82,7 +82,7 @@ function saveImage(image, file) {
             console.error(error.code);
         }, () => { // Upload completed successfully
             uploadTask.snapshot.ref.getDownloadURL().then(url => {
-                console.info("Upload Successful, URL: ${url}");
+                console.info(`Upload Successful, URL: ${url}`);
 
                 image.src = url;
                 db.collection(image.permission).doc(image.filename).withConverter(imageConverter).set(image);
@@ -186,6 +186,7 @@ function initialize() {
     displayPublicImages();
 
     firebase.auth().onAuthStateChanged(() => {
+        console.info(`User: ${user}`);
         if (user) {
             privateRef = imagesRef.child(user.uid);
             document.getElementById("authBtn").textContent = "Logout"
