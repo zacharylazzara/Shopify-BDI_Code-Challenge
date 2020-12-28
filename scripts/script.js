@@ -44,13 +44,13 @@ var imageConverter = {
 };
 
 function login() {
-    firebase.auth().signInWithRedirect(provider).catch(console.error(error => error.message));
+    firebase.auth().signInWithRedirect(provider).catch(error => console.error(error.message));
 }
 
 function logout() {
     firebase.auth().signOut().then(function() {
         location.reload(); // Refresh the page to clear everything and reinitialize
-    }).catch(console.error(error => error.message));
+    }).catch(error => console.error(error.message));
 }
 
 function uploadImage(permission = permissions.PRIVATE) {
