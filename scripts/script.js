@@ -232,9 +232,6 @@ async function loadPublicImages() {
             }
             imageDictionary[id] = image;
         });
-        for(var key in imageDictionary) { // probably not gonna work as its gonna remove all keys each iteration
-            delete imageDictionary[key]
-        }
     });
 }
 
@@ -246,6 +243,9 @@ async function loadOwner(id) {
         userDictionary[uid] = owner;
         display(id);
     });
+    for(var key in imageDictionary) { // probably not gonna work as its gonna remove all keys each iteration
+        delete imageDictionary[key];
+    }
 }
 
 function saveUser() {
