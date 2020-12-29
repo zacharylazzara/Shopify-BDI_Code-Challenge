@@ -100,7 +100,7 @@ function saveImage(image, file) {
 
 function displayImage(image) {
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
-    console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner ?? user ? user.uid : null}`);
+    console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner ?? image.permission}`);
 
     var profile = loadUser(image.owner ?? null);
 
