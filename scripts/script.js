@@ -10,6 +10,8 @@ var permissions;
 var publicRef;
 var privateRef;
 
+let outdatedIDs = new Set();
+
 let changes = new Set();
 var imageDictionary = {};
 var userDictionary = {};
@@ -171,7 +173,7 @@ function display(image, profile) {
                     db.collection(image.permission).doc(image.filename).delete().then(() => {
                         console.info(`Successfully Deleted: ${id}`);
                         delete imageDictionary[id];
-                        clear(id);
+                        //clear(id);
                     });
                 });
             }
@@ -183,6 +185,7 @@ function display(image, profile) {
 
 function clear(id) {
     console.debug(`Clearing: ${id}`);
+    outdatedIDs.delete(id);
     changes.delete(id);
     item = document.getElementById(id);
     item.parentNode.removeChild(item);
@@ -190,22 +193,38 @@ function clear(id) {
 
 async function loadPrivateImages() {
     if (user) {
+        let currentIDs = new Set();
+
         db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
                 var image = doc.data();
                 var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
                 console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}, ID: ${id}`);
                 
-                if (!imageDictionary[id]) {
+                if (!currentIDs[id]) {
+                    currentIDs.add(id);
+                    outdatedIDs.add(id);
                     loadOwner(image);
                 }
 
-                imageDictionary[id] = image;
-                changes.add(id);
+               // outdatedIDs.add();
+
+                // imageDictionary[id] = image;
+                // changes.add(id);
 
      
             });
         });
+
+        outdatedIDs.forEach(outdated => {
+            if (!(outdated in currentIDs)) {
+                clear(outdated);
+            }
+        });
+
+
+
+
     } else {
         throw "User must be logged in to view private images!";
     }
