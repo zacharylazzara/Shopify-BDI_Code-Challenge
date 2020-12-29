@@ -169,7 +169,7 @@ function initialize() {
         }).catch(error => console.error(error.message));
     }
 
-    displayPublicImages();
+    loadPublicImages();
 
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
