@@ -192,13 +192,12 @@ function initialize() {
     permissions = {
         PUBLIC: "public"
     }
-    
+
     publicRef = imagesRef.child("public");
 
     if (!user) {
         firebase.auth().getRedirectResult().then(result => {
             user = result.user;
-            console.info(`User: ${user ? user.displayName : "N/A"}, UID: ${user ? user.uid : "N/A"}`);
         }).catch(error => console.error(error.message));
     }
 
@@ -219,6 +218,7 @@ function initialize() {
         } else {
             document.getElementById("authBtn").textContent = "Login"
         }
+        console.info(`User: ${user ? user.displayName : "N/A"}, UID: ${user ? user.uid : "N/A"}`);
     });
 }
 
