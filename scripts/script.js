@@ -107,23 +107,35 @@ function deleteImage(image) {
     }
 }
 
-function loadPrivateImages() { // TODO: needs to be paginated (also maybe we should somehow merge the code into one? as this is duplicate code)
+
+
+
+
+
+function displayImage(image) {
+    console.debug(`Private image ${image.filename} belongs to ${user.displayName}: ${image.permission == user.uid}`);
+    var img = document.createElement("img");
+    img.setAttribute("src", image.src);
+    document.getElementById("private").appendChild(img);
+}
+
+
+
+
+async function loadPrivateImages() { // TODO: needs to be paginated (also maybe we should somehow merge the code into one? as this is duplicate code)
     if (user) {
         console.log(`Loading private images for ${user.displayName}...`);
-        db.collection(permissions.PRIVATE).get().then(snapshot => {
+        await db.collection(permissions.PRIVATE).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
                 console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == user.uid ? "private" : "public"}`);
-                privateImages.push(doc.data());
+                
+                
+                displayImage(doc.data());
+                
+                
+                //privateImages.push(doc.data());
             });
         });
-
-        
-        // db.collection(permissions.PRIVATE).onSnapshot(snapshot => {
-        //     snapshot.forEach(doc => {
-        //         console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == user.uid ? "private" : "public"}`);
-        //         privateImages.push(doc.data());
-        //     });
-        // });
     } else {
         throw "User must be logged in to view private images!";
     }
