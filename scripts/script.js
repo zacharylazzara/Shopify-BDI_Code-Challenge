@@ -118,11 +118,7 @@ function display(uid) {
     console.log(image);
     console.log(profile);
 
-    // starCountRef.on('value', (snapshot) => {
-    //     const data = snapshot.val();
-    //     updateStarCount(postElement, data);
-    //   });
-
+  
 
 
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
@@ -209,9 +205,8 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
             snapshot.forEach(doc => {
                 var image = doc.data();
                 console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}`);
-                
                 imageDictionary[image.owner] = image;
-                
+                display(image.owner);
                 //images.push(doc.data());
                 
 
@@ -239,6 +234,8 @@ async function loadPublicImages() { // TODO: needs to be paginated, also needs t
             var image = doc.data();
             console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}`);
             imageDictionary[image.owner] = image;
+            display(image.owner);
+
             //images.push(doc.data());
             //displayImage(doc.data());
 
@@ -280,9 +277,6 @@ function initialize() {
     }
     loadPublicImages();
 
-    for (let key in imageDictionary) {
-        display(key);
-    }
 
 
 
@@ -299,13 +293,6 @@ function initialize() {
 
 
     
-
-//example code:
-    // var starCountRef = firebase.database().ref('posts/' + postId + '/starCount');
-    // starCountRef.on('value', (snapshot) => {
-    //   const data = snapshot.val();
-    //   updateStarCount(postElement, data);
-    // });
 
 
 
