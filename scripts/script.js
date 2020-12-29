@@ -84,7 +84,7 @@ function saveImage(image, file) {
             console.error(error.code);
         }, () => { // Upload completed successfully
             uploadTask.snapshot.ref.getDownloadURL().then(url => {
-                console.info(`Upload Successful, Type: ${doc.data().permission == user.uid ? "private" : "public"}, URL: ${url}`);
+                console.info(`Upload Successful, Type: ${image.permission == user.uid ? "private" : "public"}, URL: ${url}`);
 
                 image.src = url;
                 db.collection(image.permission).doc(image.filename).withConverter(imageConverter).set(image);
