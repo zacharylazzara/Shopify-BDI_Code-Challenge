@@ -1,3 +1,5 @@
+var db = firebase.firestore();
+
 var provider = new firebase.auth.GithubAuthProvider();
 var user = firebase.auth().currentUser;
 
