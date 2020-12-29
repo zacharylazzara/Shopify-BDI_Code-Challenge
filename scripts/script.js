@@ -202,11 +202,13 @@ async function loadPrivateImages() {
                 console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}, ID: ${id}`);
                 
                 if (!currentIDs[id]) {
-                    currentIDs.add(id);
-                    outdatedIDs.add(id);
                     loadOwner(image);
                 }
 
+                currentIDs.add(id);
+                outdatedIDs.add(id);
+
+                
                // outdatedIDs.add();
 
                 // imageDictionary[id] = image;
