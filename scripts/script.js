@@ -194,8 +194,8 @@ async function loadPrivateImages() {
                 if (imageDictionary[id]) {
                     clear(image);
                 }
-                loadOwner(id);
                 
+                loadOwner(id);
                 imageDictionary[id] = image;
             });
         });
@@ -210,9 +210,11 @@ async function loadPublicImages() {
             var image = doc.data();
             var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
             console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, ID: ${id}`);
-            if (!imageDictionary[id]) {
-                loadOwner(id);
+            if (imageDictionary[id]) {
+                clear(image);
             }
+
+            loadOwner(id);
             imageDictionary[id] = image;
         });
     });
