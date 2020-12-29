@@ -193,7 +193,7 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
         });
 
         console.info(`Loaded ${images.length} private image(s)`);
-        return images;
+        resolve(images);
     } else {
         throw "User must be logged in to view private images!";
     }
@@ -212,13 +212,13 @@ async function loadPublicImages() { // TODO: needs to be paginated, also needs t
     });
 
     console.info(`Loaded ${images.length} public image(s)`);
-    return images;
+    resolve(images);
 }
 
 async function loadOwner(uid) {
     await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot(doc => {
         console.debug(`Loading ${doc.data().displayName}'s public profile`);
-        return doc.data();
+        resolve(doc.data());
     });
 }
 
