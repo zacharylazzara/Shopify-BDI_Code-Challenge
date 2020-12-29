@@ -98,92 +98,92 @@ function saveImage(image, file) {
     }
 }
 
-function displayImage(image, profile) {
+function displayImage(image) {
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
     console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner}`);
 
-    //var profile = loadUser(image.owner);
-
-    var card = document.createElement("div");
-    var cardImage = document.createElement("img");
-    var cardBody = document.createElement("div");
-    var title = document.createElement("h4");
-    var profile = document.createElement("div");
-    var flex = document.createElement("div");
-    var avatar = document.createElement("img");
-    //var nbsp = document.createElement("p");
-    var profileDetails = document.createElement("div");
-    var name = document.createElement("h6");
-    var email = document.createElement("h6");
-    var small = document.createElement("small");
-    var deleteBtn = document.createElement("button");
-
-    card.className = "card image-card";
-    card.id = `${image.permission}/${image.filename}`;
-    cardImage.className = "image card-img-top";
-    cardBody.className = "card-body";
-    title.className = "card-title";
-    profile.className = "d-flex justify-content-between";
-    flex.className = "d-flex";
-    avatar.className = "avatar";
-    name.className = "profile";
-    email.className = "profile";
-    deleteBtn.className = "btn btn-danger";
-    deleteBtn.id = `${image.permission}/${image.filename}`;
-
-    cardImage.setAttribute("src", image.src);
-    title.textContent = image.filename;
-    // TODO: these need to load from a different collection for each user (we use the owner UID from the image to find it; if owner UID is null we use the logged in user's info)
-    avatar.setAttribute("src", profile.photoURL);
-    name.textContent = profile.displayName;
-    small.textContent = profile.email;
-
-
-    // avatar.setAttribute("src", user.photoURL);
-    // name.textContent = user.displayName;
-    // small.textContent = user.email;
-    //////////////
-    deleteBtn.textContent = "Delete";
-
-    document.getElementById(display).appendChild(card);
-    card.appendChild(cardImage);
-    card.appendChild(cardBody);
-    cardBody.appendChild(title);
-    cardBody.appendChild(document.createElement("hr"));
-    cardBody.appendChild(profile);
-    profile.appendChild(flex);
-    flex.appendChild(avatar);
-    flex.appendChild(document.createTextNode("\u00A0"));
-    flex.appendChild(profileDetails);
-    profileDetails.appendChild(name);
-    profileDetails.appendChild(email);
-    email.appendChild(small);
-    profile.appendChild(deleteBtn);
-
-    deleteBtn.onclick = function() {
-        if (user) {
-            if (confirm(`Delete ${image.filename}?`)) {
-                var deleteRef = privateRef.child(image.filename);
+    loadUser(image.owner).then(profile => {
+        var card = document.createElement("div");
+        var cardImage = document.createElement("img");
+        var cardBody = document.createElement("div");
+        var title = document.createElement("h4");
+        var profile = document.createElement("div");
+        var flex = document.createElement("div");
+        var avatar = document.createElement("img");
+        //var nbsp = document.createElement("p");
+        var profileDetails = document.createElement("div");
+        var name = document.createElement("h6");
+        var email = document.createElement("h6");
+        var small = document.createElement("small");
+        var deleteBtn = document.createElement("button");
     
-                if (image.permission === permissions.PUBLIC) {
-                    deleteRef = publicRef.child(image.filename);
-                }
+        card.className = "card image-card";
+        card.id = `${image.permission}/${image.filename}`;
+        cardImage.className = "image card-img-top";
+        cardBody.className = "card-body";
+        title.className = "card-title";
+        profile.className = "d-flex justify-content-between";
+        flex.className = "d-flex";
+        avatar.className = "avatar";
+        name.className = "profile";
+        email.className = "profile";
+        deleteBtn.className = "btn btn-danger";
+        deleteBtn.id = `${image.permission}/${image.filename}`;
     
-                // TODO: if db throws an error then we need to restore the image, since it'll be out of sync otherwise
+        cardImage.setAttribute("src", image.src);
+        title.textContent = image.filename;
+        // TODO: these need to load from a different collection for each user (we use the owner UID from the image to find it; if owner UID is null we use the logged in user's info)
+        avatar.setAttribute("src", profile.photoURL);
+        name.textContent = profile.displayName;
+        small.textContent = profile.email;
+    
+    
+        // avatar.setAttribute("src", user.photoURL);
+        // name.textContent = user.displayName;
+        // small.textContent = user.email;
+        //////////////
+        deleteBtn.textContent = "Delete";
+    
+        document.getElementById(display).appendChild(card);
+        card.appendChild(cardImage);
+        card.appendChild(cardBody);
+        cardBody.appendChild(title);
+        cardBody.appendChild(document.createElement("hr"));
+        cardBody.appendChild(profile);
+        profile.appendChild(flex);
+        flex.appendChild(avatar);
+        flex.appendChild(document.createTextNode("\u00A0"));
+        flex.appendChild(profileDetails);
+        profileDetails.appendChild(name);
+        profileDetails.appendChild(email);
+        email.appendChild(small);
+        profile.appendChild(deleteBtn);
+    
+        deleteBtn.onclick = function() {
+            if (user) {
+                if (confirm(`Delete ${image.filename}?`)) {
+                    var deleteRef = privateRef.child(image.filename);
         
-                deleteRef.delete().then(() => {
-                    db.collection(image.permission).doc(image.filename).delete().then(() => {
-                        console.info("Successfully deleted");
+                    if (image.permission === permissions.PUBLIC) {
+                        deleteRef = publicRef.child(image.filename);
+                    }
+        
+                    // TODO: if db throws an error then we need to restore the image, since it'll be out of sync otherwise
+            
+                    deleteRef.delete().then(() => {
+                        db.collection(image.permission).doc(image.filename).delete().then(() => {
+                            console.info("Successfully deleted");
+                        });
                     });
-                });
-        
-                item = document.getElementById(`${image.permission}/${image.filename}`);
-                item.parentNode.removeChild(item);
+            
+                    item = document.getElementById(`${image.permission}/${image.filename}`);
+                    item.parentNode.removeChild(item);
+                }
+            } else {
+                throw "User must be logged in to delete images!";
             }
-        } else {
-            throw "User must be logged in to delete images!";
         }
-    }
+    });
 }
 
 async function loadPrivateImages() { // TODO: needs to be paginated (also maybe we should somehow merge the code into one? as this is duplicate code)
@@ -191,7 +191,7 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
         await db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
                 console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${doc.data().permission == user.uid}`);
-                loadUser(doc.data().owner).then(profile => displayImage(doc.data(), profile));
+                displayImage(doc.data());
             });
         });
     } else {
@@ -199,11 +199,11 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
     }
 }
 
-async function loadPublicImages() { // TODO: needs to be paginated, also the converter might not work; also needs to only load the changes? we end up with duplicates displaying
+async function loadPublicImages() { // TODO: needs to be paginated, also needs to only load the changes? we end up with duplicates displaying
     await db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
             console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}`);
-            loadUser(doc.data().owner).then(profile => displayImage(doc.data(), profile));
+            displayImage(doc.data());
         });
     });
 }
