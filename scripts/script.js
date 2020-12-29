@@ -173,6 +173,7 @@ function loadPublicImages() { // TODO: needs to be paginated, also the converter
 }
 
 function displayPrivateImages() {
+    loadPrivateImages();
     privateImages.forEach(image => {
         var img = document.createElement("img");
         img.setAttribute("src", image.src);
@@ -181,6 +182,7 @@ function displayPrivateImages() {
 }
 
 function displayPublicImages() {
+    loadPublicImages();
     publicImages.forEach(image => {
         var img = document.createElement("img");
         img.setAttribute("src", image.src);
