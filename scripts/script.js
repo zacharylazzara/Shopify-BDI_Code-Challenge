@@ -217,7 +217,8 @@ function initialize() {
                 PRIVATE: user.uid
             };
 
-            displayPrivateImages();
+            //displayPrivateImages();
+            loadPrivateImages();
         } else {
             document.getElementById("authBtn").textContent = "Login"
         }
