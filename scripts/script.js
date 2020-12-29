@@ -98,11 +98,11 @@ function saveImage(image, file) {
     }
 }
 
-function displayImage(image) {
+async function displayImage(image) {
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
     console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner}`);
 
-    var profile = loadUser(image.owner);
+    var profile = await loadUser(image.owner);
 
     var card = document.createElement("div");
     var cardImage = document.createElement("img");
@@ -209,12 +209,10 @@ async function loadPublicImages() { // TODO: needs to be paginated, also the con
 }
 
 async function loadUser(uid) {
-    var profile;
     await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot(doc => {
         console.debug(`Loading ${doc.data().displayName}'s public profile`);
-        profile = doc.data();
+        return doc.data();
     });
-    return profile;
 }
 
 function saveUser() {
