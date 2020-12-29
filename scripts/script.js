@@ -117,7 +117,7 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
         console.log(`Loading private images for ${user.displayName}...`);
         await db.collection(permissions.PRIVATE).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
-                console.debug(`Loading: ${image.filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}`);
+                console.debug(`Loading: ${image.filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${doc.data().permission == user.uid}`);
                 displayImage(doc.data());
             });
         });
