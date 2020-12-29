@@ -207,7 +207,7 @@ async function loadPrivateImages() {
                 changes.add(id);
 
                 for(var key in imageDictionary) {
-                    if (!change.has(key)) {
+                    if (!changes.has(key)) {
                         console.debug(`ID ${key} is outdated`);
                         clear(key);
                     }
