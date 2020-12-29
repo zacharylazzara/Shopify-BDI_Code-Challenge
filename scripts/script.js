@@ -41,7 +41,7 @@ class Image {
         this.permission = permission;
         this.src = src;
         this.uploadDate = uploadDate;
-        this.owner = this.permission === permissions.PRIVATE ? null : owner;
+        this.owner = owner; //this.permission === permissions.PRIVATE ? null : owner;
     }
 }
 
@@ -100,9 +100,9 @@ function saveImage(image, file) {
 
 function displayImage(image) {
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
-    console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner ?? image.permission}`);
+    console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner}`);
 
-    var profile = loadUser(image.owner ?? image.permission);
+    var profile = loadUser(image.owner);
 
     var card = document.createElement("div");
     var cardImage = document.createElement("img");
