@@ -170,7 +170,7 @@ function display(id) {
                     db.collection(image.permission).doc(image.filename).delete().then(() => {
                         console.info(`Successfully Deleted: ${id}`);
                         delete imageDictionary[id];
-                        clear(id);
+                        //clear(id);
                     });
                 });
             }
