@@ -60,13 +60,16 @@ document.getElementById("uploadBtn").addEventListener("click", () => {
 
 function saveImage(image, file) {
     if (user) {
-        var uploadTask = privateRef.child(image.filename);
+        const uploadTask = storage.ref(`images/${image.permission}/${image.filename}`).put(file, file.type);
 
-        if (image.permission === permissions.PUBLIC) {
-            uploadTask = publicRef.child(image.filename);
-        }
 
-        uploadTask.put(file, file.type);
+        // var uploadTask = privateRef.child(image.filename);
+
+        // if (image.permission === permissions.PUBLIC) {
+        //     uploadTask = publicRef.child(image.filename);
+        // }
+
+        // uploadTask.put(file, file.type);
 
         // switch(image.permission) {
         //     case permissions.PUBLIC:
