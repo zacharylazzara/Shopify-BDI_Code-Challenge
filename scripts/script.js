@@ -4,11 +4,35 @@ var provider = new firebase.auth.GithubAuthProvider();
 var user;
 
 var storage = firebase.storage();
-var imagesRef = storage.ref("images")
+var imagesRef = storage.ref("images");
 
 var permissions;
 var publicRef;
 var privateRef;
+
+class User {
+    constructor(uid, displayName, email, photoURL) {
+        this.uid = uid;
+        this.displayName = displayName;
+        this.email = email;
+        this.photoURL = photoURL;
+    }
+}
+
+var userConverter = {
+    toFirestore: profile => {
+        return {
+            uid: profile.uid,
+            displayName: profile.displayName,
+            email: profile.email,
+            photoURL: profile.photoURL
+        }
+    },
+    fromFirestore: (snapshot, options) => {
+        const data = snapshot.data(options);
+        return new User(data.uid, data.displayName, data.email, data.photoURL);
+    }
+}
 
 class Image {
     constructor(filename, metadata, permission = permissions.PRIVATE, src = null, uploadDate = Date.now(), owner = user.uid) {
@@ -78,6 +102,8 @@ function displayImage(image) {
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
     console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner ?? user ? user.uid : null}`);
 
+    var profile = loadUser(image.owner ?? user ? user.uid : null);
+
     var card = document.createElement("div");
     var cardImage = document.createElement("img");
     var cardBody = document.createElement("div");
@@ -108,9 +134,14 @@ function displayImage(image) {
     cardImage.setAttribute("src", image.src);
     title.textContent = image.filename;
     // TODO: these need to load from a different collection for each user (we use the owner UID from the image to find it; if owner UID is null we use the logged in user's info)
-    avatar.setAttribute("src", user.photoURL);
-    name.textContent = user.displayName;
-    small.textContent = user.email;
+    avatar.setAttribute("src", profile.photoURL);
+    name.textContent = profile.displayName;
+    small.textContent = profile.email;
+
+
+    // avatar.setAttribute("src", user.photoURL);
+    // name.textContent = user.displayName;
+    // small.textContent = user.email;
     //////////////
     deleteBtn.textContent = "Delete";
 
@@ -157,8 +188,7 @@ function displayImage(image) {
 
 async function loadPrivateImages() { // TODO: needs to be paginated (also maybe we should somehow merge the code into one? as this is duplicate code)
     if (user) {
-        console.log(`Loading private images for ${user.displayName}...`);
-        await db.collection(permissions.PRIVATE).onSnapshot(snapshot => {
+        await db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
                 console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${doc.data().permission == user.uid}`);
                 displayImage(doc.data());
@@ -170,13 +200,27 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
 }
 
 async function loadPublicImages() { // TODO: needs to be paginated, also the converter might not work; also needs to only load the changes? we end up with duplicates displaying
-    console.log("Loading public images...");
     await db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
             console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}`);
             displayImage(doc.data());
         });
     });
+}
+
+async function loadUser(uid) {
+    await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot(doc => {
+        console.debug(`Loading ${doc.data().displayName}'s public profile`);
+        return doc.data();
+    });
+}
+
+function saveUser() {
+    if (user) {
+        db.collection("users").doc(user.uid).withConverter(userConverter).set(user);
+    } else {
+        throw "User must be logged in to save profile information!";
+    }
 }
 
 function initialize() {
@@ -197,6 +241,7 @@ function initialize() {
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
             globalThis.user = user;
+            saveUser();
             document.getElementById("authBtn").textContent = "Logout"
             
             privateRef = imagesRef.child(user.uid);
@@ -205,7 +250,6 @@ function initialize() {
                 PRIVATE: user.uid
             };
 
-            //displayPrivateImages();
             loadPrivateImages();
         } else {
             document.getElementById("authBtn").textContent = "Login"
