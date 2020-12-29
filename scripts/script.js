@@ -157,7 +157,7 @@ function displayImage(image) {
     profileDetails.appendChild(name);
     profileDetails.appendChild(email);
     email.appendChild(small);
-    flex.appendChild(button);
+    profile.appendChild(button);
 
 
                 // <div class="card image-card">
