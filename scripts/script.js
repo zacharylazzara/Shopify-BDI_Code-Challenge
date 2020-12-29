@@ -178,27 +178,44 @@ function displayImage(image, profile) {
 
 async function loadPrivateImages() { // TODO: needs to be paginated (also maybe we should somehow merge the code into one? as this is duplicate code)
     if (user) {
+        var images = [];
         await db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
                 console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${doc.data().permission == user.uid}`);
-                loadUser(doc.data().owner).then(profile => displayImage(doc.data(), profile));
+                images.push(doc.data());
+                
+                //displayImage(doc.data());
+                
+                
+                
+                // loadUser(doc.data().owner).then(profile => displayImage(doc.data(), profile));
             });
         });
+
+        console.info(`Loaded ${images.length} private image(s)`);
+        return images;
     } else {
         throw "User must be logged in to view private images!";
     }
 }
 
 async function loadPublicImages() { // TODO: needs to be paginated, also needs to only load the changes? we end up with duplicates displaying
+    var images = [];
     await db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
             console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}`);
-            loadUser(doc.data().owner).then(profile => console.log(profile));
+            images.push(doc.data());
+            //displayImage(doc.data());
+
+            //loadUser(doc.data().owner).then(profile => displayImage(doc.data(), profile));
         });
     });
+
+    console.info(`Loaded ${images.length} public image(s)`);
+    return images;
 }
 
-async function loadUser(uid) {
+async function loadOwner(uid) {
     await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot(doc => {
         console.debug(`Loading ${doc.data().displayName}'s public profile`);
         return doc.data();
@@ -226,7 +243,27 @@ function initialize() {
         }).catch(error => console.error(error.message));
     }
 
-    loadPublicImages();
+    loadPublicImages().then(images => images.forEach(image => {
+        loadOwner(image.owner).then(profile => {
+            displayImage(image, profile);
+        });
+    }));
+
+    loadPrivateImages().then(images => images.forEach(image => {
+        loadOwner(image.owner).then(profile => {
+            displayImage(image, profile);
+        });
+    }));
+
+    
+
+
+
+
+
+
+
+
 
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
