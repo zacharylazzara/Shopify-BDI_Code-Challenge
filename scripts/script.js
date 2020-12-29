@@ -1,20 +1,17 @@
 var db = firebase.firestore();
 
 var provider = new firebase.auth.GithubAuthProvider();
-var user = firebase.auth().currentUser;
+var user;// = firebase.auth().currentUser;
 
 var storage = firebase.storage();
 var imagesRef = storage.ref("images")
 
-var publicRef = imagesRef.child("public");
-var privateRef = imagesRef.child(user ? user.uid : "orhpan");
 var privateImages = [];
 var publicImages = [];
 
-const permissions = {
-    PUBLIC: "public",
-    PRIVATE: user ? user.uid : "orphan"
-};
+var permissions;
+var publicRef;
+var privateRef;
 
 class Image {
     constructor(filename, metadata, permission = permissions.PRIVATE, src = null, uploadDate = Date.now(), owner = user.uid) {
@@ -192,6 +189,12 @@ function displayPublicImages() {
 }
 
 function initialize() {
+    permissions = {
+        PUBLIC: "public"
+    }
+    
+    publicRef = imagesRef.child("public");
+
     if (!user) {
         firebase.auth().getRedirectResult().then(result => {
             user = result.user;
@@ -201,9 +204,17 @@ function initialize() {
 
     displayPublicImages();
 
-    firebase.auth().onAuthStateChanged(() => {
+    firebase.auth().onAuthStateChanged(user => {
         if (user) {
+            globalThis.user = user;
             document.getElementById("authBtn").textContent = "Logout"
+            
+            privateRef = imagesRef.child(user.uid);
+            permissions = {
+                PUBLIC: "public",
+                PRIVATE: user.uid
+            };
+
             displayPrivateImages();
         } else {
             document.getElementById("authBtn").textContent = "Login"
