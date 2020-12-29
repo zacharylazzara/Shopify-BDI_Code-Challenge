@@ -199,19 +199,19 @@ async function loadPrivateImages() {
                     loadOwner(id);
                 }
 
-                changes.forEach(change => {
-                    changes.delete(change);
-                });
+                // changes.forEach(change => {
+                //     changes.delete(change);
+                // });
                 
                 imageDictionary[id] = image;
                 changes.add(id);
 
-                for(var key in imageDictionary) {
-                    if (!changes.has(key)) {
-                        console.debug(`ID ${key} is outdated`);
-                        clear(key);
-                    }
-                }
+                // for(var key in imageDictionary) { // TODO: it kinda works but we need to iterate through everything before we do this stuff
+                //     if (!changes.has(key)) {
+                //         console.debug(`ID ${key} is outdated`);
+                //         clear(key);
+                //     }
+                // }
 
                 // imageDictionary.forEach(image => {
                 //     if (!(image))
@@ -237,7 +237,16 @@ async function loadPrivateImages() {
 
                 
             });
-            
+            for(var key in imageDictionary) { // TODO: it kinda works but we need to iterate through everything before we do this stuff
+                if (!changes.has(key)) {
+                    console.debug(`ID ${key} is outdated`);
+                    clear(key);
+                }
+            }
+
+            changes.forEach(change => {
+                changes.delete(change);
+            });
         });
     } else {
         throw "User must be logged in to view private images!";
