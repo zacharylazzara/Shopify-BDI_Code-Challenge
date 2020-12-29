@@ -102,7 +102,7 @@ function displayImage(image) {
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
     console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner ?? image.permission}`);
 
-    var profile = loadUser(image.owner ?? null);
+    var profile = loadUser(image.owner ?? image.permission);
 
     var card = document.createElement("div");
     var cardImage = document.createElement("img");
@@ -134,9 +134,9 @@ function displayImage(image) {
     cardImage.setAttribute("src", image.src);
     title.textContent = image.filename;
     // TODO: these need to load from a different collection for each user (we use the owner UID from the image to find it; if owner UID is null we use the logged in user's info)
-    avatar.setAttribute("src", profile.photoURL ?? user.photoURL);
-    name.textContent = profile.displayName ?? user.displayName;
-    small.textContent = profile.email ?? user.email;
+    avatar.setAttribute("src", profile.photoURL);
+    name.textContent = profile.displayName;
+    small.textContent = profile.email;
 
 
     // avatar.setAttribute("src", user.photoURL);
