@@ -79,12 +79,12 @@ function saveImage(image, file) {
         // }
 
         uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, snapshot => { // Upload in progress
-            console.info("Upload Progress: ${(snapshot.bytesTransferred / snapshot.totalBytes) * 100}%");
+            console.info(`Upload Progress: ${(snapshot.bytesTransferred / snapshot.totalBytes) * 100}%`);
         }, error => { // Upload error
             console.error(error.code);
         }, () => { // Upload completed successfully
             uploadTask.snapshot.ref.getDownloadURL().then(url => {
-                console.info(`Upload Successful, URL: ${url}`);
+                console.info(`Upload Successful, Type: ${doc.data().permission == user.uid ? "private" : "public"}, URL: ${url}`);
 
                 image.src = url;
                 db.collection(image.permission).doc(image.filename).withConverter(imageConverter).set(image);
@@ -134,7 +134,7 @@ function deleteImage(image) {
 
 function loadPrivateImages() { // TODO: needs to be paginated (also maybe we should somehow merge the code into one? as this is duplicate code)
     if (user) {
-        console.log(`Loading private images for UID: ${user.uid}...`);
+        console.log(`Loading private images for ${user.displayName}...`);
         db.collection(permissions.PRIVATE).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
                 console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == user.uid ? "private" : "public"}`);
