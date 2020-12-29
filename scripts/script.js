@@ -168,11 +168,11 @@ function display(id) {
                 deleteRef.delete().then(() => {
                     db.collection(image.permission).doc(image.filename).delete().then(() => {
                         console.info("Successfully deleted");
+                        delete imageDictionary[id];
+                        item = document.getElementById(`${image.permission}/${image.filename}`);
+                        item.parentNode.removeChild(item);
                     });
                 });
-        
-                item = document.getElementById(`${image.permission}/${image.filename}`);
-                item.parentNode.removeChild(item);
             }
         } else {
             throw "User must be logged in to delete images!";
