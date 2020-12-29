@@ -244,7 +244,9 @@ function initialize() {
     }
 
     loadPublicImages().then(images => images.forEach(image => {
+        console.debug(`Passing ${image.filename} to loadOwner()`);
         loadOwner(image.owner).then(profile => {
+            console.debug(`Passing ${profile.displayName} and ${image.filename} to displayImage()`);
             displayImage(image, profile);
         });
     }));
