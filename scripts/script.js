@@ -199,6 +199,8 @@ async function loadPrivateImages() {
                     loadOwner(id);
                 }
 
+                
+
                 imageDictionary[id] = image;
                 changes.add(id);
 
@@ -212,6 +214,9 @@ async function loadPrivateImages() {
 
                 
             });
+            for(var key in imageDictionary) { // probably not gonna work as its gonna remove all keys each iteration
+                delete imageDictionary[key]
+            }
         });
     } else {
         throw "User must be logged in to view private images!";
