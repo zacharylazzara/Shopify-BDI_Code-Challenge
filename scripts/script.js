@@ -135,7 +135,7 @@ function deleteImage(image) {
 function loadPrivateImages() { // TODO: needs to be paginated (also maybe we should somehow merge the code into one? as this is duplicate code)
     if (user) {
         console.log(`Loading private images for UID: ${user.uid}...`);
-        db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
+        db.collection(permissions.PRIVATE).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
                 console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == user.uid ? "private" : "public"}`);
                 privateImages.push(doc.data());
