@@ -209,10 +209,13 @@ async function loadPublicImages() { // TODO: needs to be paginated, also the con
 }
 
 async function loadUser(uid) {
-    await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot(doc => {
-        console.debug(`Loading ${doc.data().displayName}'s public profile`);
-        return doc.data();
-    });
+    if (uid) {
+        await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot(doc => {
+            console.debug(`Loading ${doc.data().displayName}'s public profile`);
+            return doc.data();
+        });
+    }
+    return null;
 }
 
 function saveUser() {
