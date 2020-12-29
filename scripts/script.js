@@ -190,7 +190,7 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
 }
 
 async function loadPublicImages() { // TODO: needs to be paginated, also needs to only load the changes? we end up with duplicates displaying
-    await db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot({includeMetadataChanges: false}, snapshot => {
+    await db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
             console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}`);
             loadUser(doc.data().owner).then(profile => displayImage(doc.data(), profile));
@@ -199,7 +199,7 @@ async function loadPublicImages() { // TODO: needs to be paginated, also needs t
 }
 
 async function loadUser(uid) {
-    await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot(doc => {
+    await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot({includeMetadataChanges: false}, doc => {
         console.debug(`Loading ${doc.data().displayName}'s public profile`);
         return doc.data();
     });
