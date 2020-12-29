@@ -237,16 +237,25 @@ async function loadPrivateImages() {
 
                 
             });
-            for(var key in imageDictionary) { // TODO: it kinda works but we need to iterate through everything before we do this stuff
-                if (!changes.has(key)) {
-                    console.debug(`ID ${key} is outdated`);
-                    clear(key);
-                }
-            }
-
             changes.forEach(change => {
-                changes.delete(change);
+                if (!(change in imageDictionary)) {
+                    console.debug(`ID ${change} is outdated`);
+                    clear(change);
+                }
             });
+
+
+
+            // for(var key in imageDictionary) { // TODO: it kinda works but we need to iterate through everything before we do this stuff
+            //     if (!changes.has(key)) {
+            //         console.debug(`ID ${key} is outdated`);
+            //         clear(key);
+            //     }
+            // }
+
+            // changes.forEach(change => {
+            //     changes.delete(change);
+            // });
         });
     } else {
         throw "User must be logged in to view private images!";
