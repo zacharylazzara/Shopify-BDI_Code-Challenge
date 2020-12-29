@@ -131,22 +131,24 @@ function displayImage(image) {
 
     deleteBtn.onclick = function() {
         if (user) {
-            var deleteRef = privateRef.child(image.filename);
+            if (confirm(`Delete ${image.filename}?`)) {
+                var deleteRef = privateRef.child(image.filename);
     
-            if (image.permission === permissions.PUBLIC) {
-                deleteRef = publicRef.child(image.filename);
-            }
-
-            // TODO: if db throws an error then we need to restore the image, since it'll be out of sync otherwise
+                if (image.permission === permissions.PUBLIC) {
+                    deleteRef = publicRef.child(image.filename);
+                }
     
-            deleteRef.delete().then(() => {
-                db.collection(image.permission).doc(image.filename).delete().then(() => {
-                    console.info("Successfully deleted");
+                // TODO: if db throws an error then we need to restore the image, since it'll be out of sync otherwise
+        
+                deleteRef.delete().then(() => {
+                    db.collection(image.permission).doc(image.filename).delete().then(() => {
+                        console.info("Successfully deleted");
+                    });
                 });
-            });
-    
-            item = document.getElementById(`${image.permission}/${image.filename}`);
-            item.parentNode.removeChild(item);
+        
+                item = document.getElementById(`${image.permission}/${image.filename}`);
+                item.parentNode.removeChild(item);
+            }
         } else {
             throw "User must be logged in to delete images!";
         }
