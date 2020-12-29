@@ -74,36 +74,6 @@ function saveImage(image, file) {
     }
 }
 
-function deleteImage(image) {
-    if (user) {
-        var deleteRef = privateRef.child(image.filename);
-
-        if (image.permission === permissions.PUBLIC) {
-            deleteRef = publicRef.child(image.filename);
-        }
-
-        // switch(image.permission) {
-        //     case permissions.PUBLIC:
-        //         deleteRef = publicRef.child(image.filename);
-        //     break;
-        //     default:
-        //         deleteRef = privateRef.child(image.filename);
-        // }
-
-        // TODO: if db throws an error then we need to restore the image, since it'll be out of sync otherwise
-
-        deleteRef.delete().then(() => {
-            db.collection(image.permission).doc(image.filename).delete().then(() => {
-                console.info("Successfully deleted");
-            });
-        });
-
-        // TODO: we also need to update the UI (remove image from page to reflect changes)
-    } else {
-        throw "User must be logged in to delete images!";
-    }
-}
-
 function displayImage(image) {
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
     console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner ?? user ? user.uid : null}`);
@@ -120,9 +90,10 @@ function displayImage(image) {
     var name = document.createElement("h6");
     var email = document.createElement("h6");
     var small = document.createElement("small");
-    var button = document.createElement("button");
+    var deleteBtn = document.createElement("button");
 
     card.className = "card image-card";
+    card.id = `${image.permission}/${image.filename}`;
     cardImage.className = "image card-img-top";
     cardBody.className = "card-body";
     title.className = "card-title";
@@ -131,18 +102,17 @@ function displayImage(image) {
     avatar.className = "avatar";
     name.className = "profile";
     email.className = "profile";
-    button.className = "btn btn-danger";
-    button.id = `${image.permission}/${image.filename}`;
+    deleteBtn.className = "btn btn-danger";
+    deleteBtn.id = `${image.permission}/${image.filename}`;
 
     cardImage.setAttribute("src", image.src);
     title.textContent = image.filename;
     // TODO: these need to load from a different collection for each user (we use the owner UID from the image to find it; if owner UID is null we use the logged in user's info)
     avatar.setAttribute("src", user.photoURL);
-    //nbsp.createTextNode("\s\s");
     name.textContent = user.displayName;
     small.textContent = user.email;
     //////////////
-    button.textContent = "Delete";
+    deleteBtn.textContent = "Delete";
 
     document.getElementById(display).appendChild(card);
     card.appendChild(cardImage);
@@ -157,27 +127,30 @@ function displayImage(image) {
     profileDetails.appendChild(name);
     profileDetails.appendChild(email);
     email.appendChild(small);
-    profile.appendChild(button);
+    profile.appendChild(deleteBtn);
 
+    deleteBtn.onclick = function() {
+        if (user) {
+            var deleteRef = privateRef.child(image.filename);
+    
+            if (image.permission === permissions.PUBLIC) {
+                deleteRef = publicRef.child(image.filename);
+            }
 
-                // <div class="card image-card">
-                //     <img class="image card-img-top" src="https://www.ctvnews.ca/polopoly_fs/1.5048361.1596311985!/httpImage/image.jpg_gen/derivatives/landscape_1020/image.jpg">
-                //     <div class="card-body">
-                //         <h4 class="card-title">Fox.jpg</h4>
-                //         <hr>
-                //         <div class="d-flex justify-content-between">
-                //             <div class="d-flex">
-                //                 <img class="avatar" src="https://www.ctvnews.ca/polopoly_fs/1.5048361.1596311985!/httpImage/image.jpg_gen/derivatives/landscape_1020/image.jpg">
-                //                 <p>&nbsp;&nbsp;</p>
-                //                 <div>
-                //                     <h6 class="profile">Zachary</h6>
-                //                     <h6 class="profile"><small>email@email.com</small></h6>
-                //                 </div>
-                //             </div>
-                //             <button class="btn btn-danger right-align">Delete</button>
-                //         </div>
-                //     </div>
-                // </div>
+            // TODO: if db throws an error then we need to restore the image, since it'll be out of sync otherwise
+    
+            deleteRef.delete().then(() => {
+                db.collection(image.permission).doc(image.filename).delete().then(() => {
+                    console.info("Successfully deleted");
+                });
+            });
+    
+            item = document.getElementById(`${image.permission}/${image.filename}`);
+            item.parentNode.removeChild(item);
+        } else {
+            throw "User must be logged in to delete images!";
+        }
+    }
 }
 
 async function loadPrivateImages() { // TODO: needs to be paginated (also maybe we should somehow merge the code into one? as this is duplicate code)
