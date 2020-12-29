@@ -169,7 +169,7 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
     }
 }
 
-async function loadPublicImages() { // TODO: needs to be paginated, also the converter might not work
+async function loadPublicImages() { // TODO: needs to be paginated, also the converter might not work; also needs to only load the changes? we end up with duplicates displaying
     console.log("Loading public images...");
     await db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
