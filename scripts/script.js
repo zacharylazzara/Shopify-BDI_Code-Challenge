@@ -138,7 +138,7 @@ function displayImage(image) {
     title.textContent = image.filename;
     // TODO: these need to load from a different collection for each user (we use the owner UID from the image to find it; if owner UID is null we use the logged in user's info)
     avatar.setAttribute("src", user.photoURL);
-    nbsp.textContent = "\s\s";
+    nbsp.createTextNode("\s\s");
     name.textContent = user.displayName;
     small.textContent = user.email;
     //////////////
