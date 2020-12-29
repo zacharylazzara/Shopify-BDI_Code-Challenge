@@ -103,7 +103,7 @@ function saveImage(image, file) {
 
 function display(id) {
     var image = imageDictionary[id];
-    var profile = userDictionary[id];
+    var profile = userDictionary[id.slice(0, id.indexOf('_'))];
 
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
     console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner}`);
@@ -156,7 +156,7 @@ function display(id) {
     email.appendChild(small);
     profileContainer.appendChild(deleteBtn);
 
-    deleteBtn.onclick = function() {
+    deleteBtn.onclick = function() { // TODO: we get a warning about the time the click handler takes; should probably make it run on a separate thread later
         if (user) {
             if (confirm(`Delete ${image.filename}?`)) {
                 var deleteRef = privateRef.child(image.filename);
@@ -209,10 +209,11 @@ async function loadPublicImages() {
 }
 
 async function loadOwner(id) {
-    await db.collection("users").doc(id.slice(0, id.indexOf('_'))).withConverter(userConverter).onSnapshot(doc => {
+    var uid = id.slice(0, id.indexOf('_'));
+    await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot(doc => {
         var owner = doc.data();
         console.debug(`Loading ${owner.displayName}'s public profile`);
-        userDictionary[id] = owner;
+        userDictionary[uid] = owner;
         display(id);
     });
 }
