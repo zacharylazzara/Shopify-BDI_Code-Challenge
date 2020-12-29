@@ -1,7 +1,7 @@
 var db = firebase.firestore();
 
 var provider = new firebase.auth.GithubAuthProvider();
-var user;// = firebase.auth().currentUser;
+var user;
 
 var storage = firebase.storage();
 var imagesRef = storage.ref("images")
@@ -137,6 +137,7 @@ function loadPrivateImages() { // TODO: needs to be paginated (also maybe we sho
         console.log(`Loading private images for UID: ${user.uid}...`);
         db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
+                console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == user.uid ? "private" : "public"}`);
                 privateImages.push(doc.data());
             });
         });
@@ -159,6 +160,7 @@ function loadPublicImages() { // TODO: needs to be paginated, also the converter
     console.log("Loading public images...");
     db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
+            console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == user.uid ? "private" : "public"}`);
             publicImages.push(doc.data());
         });
     });
