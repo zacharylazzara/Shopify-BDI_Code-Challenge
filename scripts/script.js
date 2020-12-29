@@ -6,9 +6,6 @@ var user;
 var storage = firebase.storage();
 var imagesRef = storage.ref("images")
 
-var privateImages = [];
-var publicImages = [];
-
 var permissions;
 var publicRef;
 var privateRef;
@@ -107,20 +104,13 @@ function deleteImage(image) {
     }
 }
 
-
-
-
-
-
 function displayImage(image) {
     console.debug(`Private image ${image.filename} belongs to ${user.displayName}: ${image.permission == user.uid}`);
     var img = document.createElement("img");
     img.setAttribute("src", image.src);
+    img.setAttribute("width", 100);
     document.getElementById("private").appendChild(img);
 }
-
-
-
 
 async function loadPrivateImages() { // TODO: needs to be paginated (also maybe we should somehow merge the code into one? as this is duplicate code)
     if (user) {
@@ -128,47 +118,22 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
         await db.collection(permissions.PRIVATE).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
                 console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == user.uid ? "private" : "public"}`);
-                
-                
                 displayImage(doc.data());
-                
-                
-                //privateImages.push(doc.data());
             });
         });
     } else {
         throw "User must be logged in to view private images!";
     }
-    
-    // privateRef.listAll().then(res => {
-    //     res.items.forEach(itemRef => {
-    //         itemRef.getDownloadURL().then(url => {
-    //             var img = document.createElement("img");
-    //             img.setAttribute("src", url);
-    //             document.getElementById("private").appendChild(img);
-    //         });
-    //     });
-    // });
 }
 
-function loadPublicImages() { // TODO: needs to be paginated, also the converter might not work
+async function loadPublicImages() { // TODO: needs to be paginated, also the converter might not work
     console.log("Loading public images...");
-    db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
+    await db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
             console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == user.uid ? "private" : "public"}`);
-            publicImages.push(doc.data());
+            displayImage(doc.data());
         });
     });
-
-    // publicRef.listAll().then(res => {
-    //     res.items.forEach(itemRef => {
-    //         itemRef.getDownloadURL().then(url => {
-    //             var img = document.createElement("img");
-    //             img.setAttribute("src", url);
-    //             document.getElementById("public").appendChild(img);
-    //         });
-    //     });
-    // });
 }
 
 function displayPrivateImages() {
