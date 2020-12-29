@@ -106,7 +106,7 @@ function display(id) {
     var profile = userDictionary[id.slice(0, id.indexOf('_'))];
 
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
-    console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner}`);
+    console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner}, ID: ${id}`);
 
     var card = document.createElement("div");
     var cardImage = document.createElement("img");
