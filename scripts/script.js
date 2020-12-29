@@ -186,7 +186,7 @@ async function loadPrivateImages() {
             snapshot.forEach(doc => {
                 var image = doc.data();
                 console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}`);
-                var id = `${image.owner}${image.permission}${image.name}`;
+                var id = `${image.owner}_${image.permission}${image.name}`;
                 imageDictionary[id] = image;
                 loadOwner(id);
             });
@@ -201,7 +201,7 @@ async function loadPublicImages() {
         snapshot.forEach(doc => {
             var image = doc.data();
             console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}`);
-            var id = `${image.owner}${image.permission}${image.name}`;
+            var id = `${image.owner}_${image.permission}${image.name}`;
             imageDictionary[id] = image;
             loadOwner(id);
         });
@@ -209,7 +209,7 @@ async function loadPublicImages() {
 }
 
 async function loadOwner(id) {
-    await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot(doc => {
+    await db.collection("users").doc(id.slice(0, id.indexOf('_'))).withConverter(userConverter).onSnapshot(doc => {
         var owner = doc.data();
         console.debug(`Loading ${owner.displayName}'s public profile`);
         userDictionary[id] = owner;
