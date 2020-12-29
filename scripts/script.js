@@ -141,6 +141,7 @@ function displayImage(image) {
     //////////////
     button.textContent = "Delete";
 
+    document.getElementById(display).appendChild(card);
     card.appendChild(cardImage);
     card.appendChild(cardBody);
     cardBody.appendChild(title);
