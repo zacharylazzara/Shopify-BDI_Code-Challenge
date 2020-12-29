@@ -98,11 +98,11 @@ function saveImage(image, file) {
     }
 }
 
-async function displayImage(image) {
+function displayImage(image, profile) {
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
     console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner}`);
 
-    var profile = await loadUser(image.owner);
+    //var profile = loadUser(image.owner);
 
     var card = document.createElement("div");
     var cardImage = document.createElement("img");
@@ -191,7 +191,7 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
         await db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
                 console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${doc.data().permission == user.uid}`);
-                displayImage(doc.data());
+                displayImage(doc.data(), loadUser(doc.data().owner));
             });
         });
     } else {
@@ -203,7 +203,7 @@ async function loadPublicImages() { // TODO: needs to be paginated, also the con
     await db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
             console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}`);
-            displayImage(doc.data());
+            displayImage(doc.data(), loadUser(doc.data().owner));
         });
     });
 }
