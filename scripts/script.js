@@ -185,12 +185,11 @@ async function loadPrivateImages() {
         await db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
                 var image = doc.data();
-                console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}`);
                 var id = `${image.owner}_${image.permission}${image.name}`;
+                console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}, ID: ${id}`);
                 if (!imageDictionary[id]) {
                     loadOwner(id);
                 }
-
                 imageDictionary[id] = image;
             });
         });
@@ -203,8 +202,8 @@ async function loadPublicImages() {
     await db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
             var image = doc.data();
-            console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}`);
             var id = `${image.owner}_${image.permission}${image.name}`;
+            console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, ID: ${id}`);
             if (!imageDictionary[id]) {
                 loadOwner(id);
             }
