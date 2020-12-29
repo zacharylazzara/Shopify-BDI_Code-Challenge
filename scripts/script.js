@@ -61,40 +61,15 @@ function saveImage(image, file) {
     if (user) {
         const uploadTask = storage.ref(`images/${image.permission}/${image.filename}`).put(file, file.type);
 
-
-        // var uploadTask = privateRef.child(image.filename);
-
-        // if (image.permission === permissions.PUBLIC) {
-        //     uploadTask = publicRef.child(image.filename);
-        // }
-
-        // uploadTask.put(file, file.type);
-
-        // switch(image.permission) {
-        //     case permissions.PUBLIC:
-        //         uploadTask = publicRef.child(image.filename).put(file, file.type);
-        //     break;
-        //     default:
-        //         uploadTask = privateRef.child(image.filename).put(file, file.type);
-        // }
-
         uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, snapshot => { // Upload in progress
-            console.info(`Upload Progress: ${(snapshot.bytesTransferred / snapshot.totalBytes) * 100}%`);
+            console.debug(`Upload Progress: ${(snapshot.bytesTransferred / snapshot.totalBytes) * 100}%`);
         }, error => { // Upload error
             console.error(error.code);
         }, () => { // Upload completed successfully
             uploadTask.snapshot.ref.getDownloadURL().then(url => {
-                console.info(`Upload Successful, Type: ${image.permission == user.uid ? "private" : "public"}, URL: ${url}`);
-
+                console.debug(`Upload Successful, Type: ${image.permission == user.uid ? "private" : "public"}, URL: ${url}`);
                 image.src = url;
                 db.collection(image.permission).doc(image.filename).withConverter(imageConverter).set(image);
-
-                // db.collection(image.permission).doc(image.filename).set({
-                //     src: url,
-                //     metadata: img.metadata,
-                //     uploadDate: image.uploadDate,
-                //     owner: image.owner
-                // });
             });
         });
     } else {
@@ -135,12 +110,20 @@ function deleteImage(image) {
 function loadPrivateImages() { // TODO: needs to be paginated (also maybe we should somehow merge the code into one? as this is duplicate code)
     if (user) {
         console.log(`Loading private images for ${user.displayName}...`);
-        db.collection(permissions.PRIVATE).onSnapshot(snapshot => {
+        db.collection(permissions.PRIVATE).get().then(snapshot => {
             snapshot.forEach(doc => {
                 console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == user.uid ? "private" : "public"}`);
                 privateImages.push(doc.data());
             });
         });
+
+        
+        // db.collection(permissions.PRIVATE).onSnapshot(snapshot => {
+        //     snapshot.forEach(doc => {
+        //         console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == user.uid ? "private" : "public"}`);
+        //         privateImages.push(doc.data());
+        //     });
+        // });
     } else {
         throw "User must be logged in to view private images!";
     }
