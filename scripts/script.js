@@ -44,7 +44,7 @@ class Image {
         this.permission = permission;
         this.src = src;
         this.uploadDate = uploadDate;
-        this.owner = owner; //this.permission === permissions.PRIVATE ? null : owner;
+        this.owner = owner;
     }
 }
 
@@ -101,35 +101,9 @@ function saveImage(image, file) {
     }
 }
 
-function display(uid) {
-    var image = imageDictionary[uid];
-    var profile = userDictionary[uid];
-
-    console.log(imageDictionary);
-    console.log(userDictionary);
-
-
-    // imageDictionary[uid].addEventListener("value", snapshot => {
-    //     image = snapshot.value;
-    // });
-
-    // userDictionary[uid].addEventListener("value", snapshot => {
-    //     profile = snapshot.value;
-    // });
-    
-    // imageDictionary[uid].on("value", snapshot => {
-    //     image = snapshot.value;
-    // });
-
-    // userDictionary[uid].on("value", snapshot => {
-    //     profile = snapshot.value;
-    // });
-
-    console.log(image);
-    console.log(profile);
-
-  
-
+function display(id) {
+    var image = imageDictionary[id];
+    var profile = userDictionary[id];
 
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
     console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner}`);
@@ -190,9 +164,7 @@ function display(uid) {
                 if (image.permission === permissions.PUBLIC) {
                     deleteRef = publicRef.child(image.filename);
                 }
-    
-                // TODO: if db throws an error then we need to restore the image, since it'll be out of sync otherwise
-        
+
                 deleteRef.delete().then(() => {
                     db.collection(image.permission).doc(image.filename).delete().then(() => {
                         console.info("Successfully deleted");
@@ -208,61 +180,40 @@ function display(uid) {
     }
 }
 
-async function loadPrivateImages() { // TODO: needs to be paginated (also maybe we should somehow merge the code into one? as this is duplicate code)
+async function loadPrivateImages() {
     if (user) {
-       // var images = [];
         await db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
                 var image = doc.data();
                 console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}`);
-                imageDictionary[image.owner] = image;
-                loadOwner(image.owner);
-                //images.push(doc.data());
-                
-
-
-
-                //displayImage(doc.data());
-                
-                
-                
-                // loadUser(doc.data().owner).then(profile => displayImage(doc.data(), profile));
+                var id = `${image.owner}${image.permission}${image.name}`;
+                imageDictionary[id] = image;
+                loadOwner(id);
             });
         });
-
-        // console.info(`Loaded ${images.length} private image(s)`);
-        // return images;
     } else {
         throw "User must be logged in to view private images!";
     }
 }
 
-async function loadPublicImages() { // TODO: needs to be paginated, also needs to only load the changes? we end up with duplicates displaying
-    //var images = [];
+async function loadPublicImages() {
     await db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
             var image = doc.data();
             console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}`);
-            imageDictionary[image.owner] = image;
-            loadOwner(image.owner);
-
-            //images.push(doc.data());
-            //displayImage(doc.data());
-
-            //loadUser(doc.data().owner).then(profile => displayImage(doc.data(), profile));
+            var id = `${image.owner}${image.permission}${image.name}`;
+            imageDictionary[id] = image;
+            loadOwner(id);
         });
     });
-
-    // console.info(`Loaded ${images.length} public image(s)`);
-    // return images;
 }
 
-async function loadOwner(uid) {
+async function loadOwner(id) {
     await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot(doc => {
         var owner = doc.data();
         console.debug(`Loading ${owner.displayName}'s public profile`);
-        userDictionary[uid] = owner;
-        display(uid);
+        userDictionary[id] = owner;
+        display(id);
     });
 }
 
@@ -286,6 +237,7 @@ function initialize() {
             user = result.user;
         }).catch(error => console.error(error.message));
     }
+
     loadPublicImages();
 
 
@@ -324,11 +276,6 @@ function initialize() {
 
             loadPrivateImages();
 
-            // loadPrivateImages().then(images => images.forEach(image => {
-            //     loadOwner(image.owner).then(profile => {
-            //         displayImage(image, profile);
-            //     });
-            // }));
         } else {
             document.getElementById("authBtn").textContent = "Login"
         }
