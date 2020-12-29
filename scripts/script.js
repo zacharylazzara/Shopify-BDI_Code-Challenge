@@ -107,6 +107,73 @@ function deleteImage(image) {
 function displayImage(image) {
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
     console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner ?? user ? user.uid : null}`);
+
+    var card = document.createElement("div");
+    var cardImage = document.createElement("img");
+    var cardBody = document.createElement("div");
+    var title = document.createElement("h4");
+    var profile = document.createElement("div");
+    var flex = document.createElement("div");
+    var avatar = document.createElement("img");
+    var profileDetails = document.createElement("div");
+    var name = document.createElement("h6");
+    var email = document.createElement("h6");
+    var button = document.createElement("button");
+
+    card.className = "card image-card";
+    cardImage.className = "image card-img-top";
+    cardBody.className = "card-body";
+    title.className = "card-title";
+    profile.className = "d-flex justify-content-between";
+    flex.className = "d-flex";
+    avatar.className = "avatar";
+    name.className = "profile";
+    email.className = "profile";
+    button.className = "btn btn-danger";
+    button.id = `${image.permission}/${image.filename}`;
+
+    cardImage.setAttribute("src", image.src);
+    title.textContent = image.filename;
+    // TODO: these need to load from a different collection for each user (we use the owner UID from the image to find it; if owner UID is null we use the logged in user's info)
+    avatar.setAttribute("src", user.photoURL);
+    name.textContent = user.displayName;
+    email.textContent = user.email;
+    //////////////
+    button.textContent = "Delete";
+
+    card.appendChild(cardImage);
+    card.appendChild(cardBody);
+    cardBody.appendChild(title);
+    cardBody.appendChild(document.createElement("hr"));
+    cardBody.appendChild(flex);
+    flex.appendChild(avatar);
+    flex.appendChild(document.createTextNode("&nbsp;&nbsp;"));
+    flex.appendChild(profileDetails);
+    profileDetails.appendChild(name);
+    profileDetails.appendChild(email);
+    flex.appendChild(button);
+
+
+                // <div class="card image-card">
+                //     <img class="image card-img-top" src="https://www.ctvnews.ca/polopoly_fs/1.5048361.1596311985!/httpImage/image.jpg_gen/derivatives/landscape_1020/image.jpg">
+                //     <div class="card-body">
+                //         <h4 class="card-title">Fox.jpg</h4>
+                //         <hr>
+                //         <div class="d-flex justify-content-between">
+                //             <div class="d-flex">
+                //                 <img class="avatar" src="https://www.ctvnews.ca/polopoly_fs/1.5048361.1596311985!/httpImage/image.jpg_gen/derivatives/landscape_1020/image.jpg">
+                //                 <p>&nbsp;&nbsp;</p>
+                //                 <div>
+                //                     <h6 class="profile">Zachary</h6>
+                //                     <h6 class="profile"><small>email@email.com</small></h6>
+                //                 </div>
+                //             </div>
+                //             <button class="btn btn-danger right-align">Delete</button>
+                //         </div>
+                //     </div>
+                // </div>
+
+
     var img = document.createElement("img");
     img.setAttribute("src", image.src);
     img.setAttribute("width", 100);
