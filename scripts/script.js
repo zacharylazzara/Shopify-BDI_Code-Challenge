@@ -151,7 +151,7 @@ function displayImage(image) {
     cardBody.appendChild(document.createElement("hr"));
     cardBody.appendChild(flex);
     flex.appendChild(avatar);
-    flex.appendChild(document.createTextNode("\s\s"));
+    flex.appendChild(document.createTextNode("\u00A0"));
     flex.appendChild(profileDetails);
     profileDetails.appendChild(name);
     profileDetails.appendChild(email);
