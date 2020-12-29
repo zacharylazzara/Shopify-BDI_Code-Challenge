@@ -11,6 +11,7 @@ var publicRef;
 var privateRef;
 
 var imageDictionary = {};
+var userDictionary = {};
 
 class User {
     constructor(uid, displayName, email, photoURL) {
@@ -107,8 +108,11 @@ function display(uid) {
     console.log(imageDictionary);
     
     imageDictionary[uid].on("value", snapshot => {
-        image = snapshot[0].value;
-        profile = snapshot[1].value;
+        image = snapshot.value;
+    });
+
+    userDictionary[uid].on("value", snapshot => {
+        profile = snapshot.value;
     });
 
     console.log(image);
@@ -203,10 +207,10 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
        // var images = [];
         await db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
-                console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${doc.data().permission == user.uid}`);
                 var image = doc.data();
+                console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}`);
                 
-                imageDictionary[image.owner][0] = image;
+                imageDictionary[image.owner] = image;
                 
                 //images.push(doc.data());
                 
@@ -232,8 +236,9 @@ async function loadPublicImages() { // TODO: needs to be paginated, also needs t
     //var images = [];
     await db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
-            console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}`);
-            imageDictionary[image.owner][0] = image;
+            var image = doc.data();
+            console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}`);
+            imageDictionary[image.owner] = image;
             //images.push(doc.data());
             //displayImage(doc.data());
 
@@ -247,8 +252,9 @@ async function loadPublicImages() { // TODO: needs to be paginated, also needs t
 
 async function loadOwner(uid) {
     await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot(doc => {
-        console.debug(`Loading ${doc.data().displayName}'s public profile`);
-        imageDictionary[uid][1] = doc.data();
+        var owner = doc.data();
+        console.debug(`Loading ${owner.displayName}'s public profile`);
+        userDictionary[uid] = owner;
     });
 }
 
@@ -273,6 +279,10 @@ function initialize() {
         }).catch(error => console.error(error.message));
     }
     loadPublicImages();
+
+    for (let key in imageDictionary) {
+        display(key);
+    }
 
 
 
