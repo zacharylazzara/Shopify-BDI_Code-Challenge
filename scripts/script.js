@@ -199,18 +199,28 @@ async function loadPrivateImages() {
                     loadOwner(id);
                 }
 
+                changes.forEach(change => {
+                    changes.delete(change);
+                });
                 
 
                 imageDictionary[id] = image;
                 changes.add(id);
 
-                changes.forEach(change => {
-                    console.debug(`Previous ID: ${change}`);
-                    if (!(change in imageDictionary)) {
-                        console.debug(`ID ${change} not found in imageDictionary`);
-                        clear(change);
-                    }
-                });
+                if (!changes.has(key in imageDictionary)) {
+                    console.debug(`ID ${change} not found in imageDictionary`);
+                    clear(change);
+                }
+
+
+
+                // changes.forEach(change => {
+                //     console.debug(`Previous ID: ${change}`);
+                //     if (!(change in imageDictionary)) {
+                //         console.debug(`ID ${change} not found in imageDictionary`);
+                //         clear(change);
+                //     }
+                // });
 
                 
             });
@@ -243,9 +253,6 @@ async function loadOwner(id) {
         userDictionary[uid] = owner;
         display(id);
     });
-    for(var key in imageDictionary) { // probably not gonna work as its gonna remove all keys each iteration
-        delete imageDictionary[key];
-    }
 }
 
 function saveUser() {
