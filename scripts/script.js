@@ -214,9 +214,7 @@ async function loadPrivateImages() {
 
                 
             });
-            for(var key in imageDictionary) { // probably not gonna work as its gonna remove all keys each iteration
-                delete imageDictionary[key]
-            }
+            
         });
     } else {
         throw "User must be logged in to view private images!";
@@ -234,6 +232,9 @@ async function loadPublicImages() {
             }
             imageDictionary[id] = image;
         });
+        for(var key in imageDictionary) { // probably not gonna work as its gonna remove all keys each iteration
+            delete imageDictionary[key]
+        }
     });
 }
 
