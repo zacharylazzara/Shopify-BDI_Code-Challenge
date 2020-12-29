@@ -168,7 +168,7 @@ function display(id) {
 
                 deleteRef.delete().then(() => {
                     db.collection(image.permission).doc(image.filename).delete().then(() => {
-                        console.info("Successfully deleted");
+                        console.info(`Successfully Deleted: ${id}`);
                         delete imageDictionary[id];
                         clear(id);
                     });
@@ -181,6 +181,7 @@ function display(id) {
 }
 
 function clear(id) {
+    console.debug(`Clearing: ${id}`);
     changes.pop(id);
     item = document.getElementById(id);
     item.parentNode.removeChild(item);
@@ -196,7 +197,7 @@ async function loadPrivateImages() {
                 if (!imageDictionary[id]) {
                     loadOwner(id);
                 }
-                
+
                 imageDictionary[id] = image;
                 changes.push(id);
 
