@@ -205,6 +205,7 @@ async function loadPrivateImages() {
                 changes.forEach(change => {
                     console.debug(`Previous ID: ${change}`);
                     if (!(change in imageDictionary)) {
+                        console.debug(`ID ${change} not found in imageDictionary`);
                         clear(change);
                     }
                 });
