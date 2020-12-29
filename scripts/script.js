@@ -134,6 +134,7 @@ function deleteImage(image) {
 
 function loadPrivateImages() { // TODO: needs to be paginated (also maybe we should somehow merge the code into one? as this is duplicate code)
     if (user) {
+        console.log(`Loading private images for UID: ${user.uid}...`);
         db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
                 privateImages.push(doc.data());
@@ -155,6 +156,7 @@ function loadPrivateImages() { // TODO: needs to be paginated (also maybe we sho
 }
 
 function loadPublicImages() { // TODO: needs to be paginated, also the converter might not work
+    console.log("Loading public images...");
     db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
             publicImages.push(doc.data());
@@ -175,6 +177,7 @@ function loadPublicImages() { // TODO: needs to be paginated, also the converter
 function displayPrivateImages() {
     loadPrivateImages();
     privateImages.forEach(image => {
+        console.debug(`Private image ${image.filename} belongs to ${user.displayName}: ${image.permission == user.uid}`);
         var img = document.createElement("img");
         img.setAttribute("src", image.src);
         document.getElementById("private").appendChild(img);
@@ -184,6 +187,7 @@ function displayPrivateImages() {
 function displayPublicImages() {
     loadPublicImages();
     publicImages.forEach(image => {
+        console.debug(`Displaying public image ${image.filename}, permission: ${image.permission}, owner: ${image.owner}`);
         var img = document.createElement("img");
         img.setAttribute("src", image.src);
         document.getElementById("public").appendChild(img);
