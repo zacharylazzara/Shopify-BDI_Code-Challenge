@@ -10,6 +10,8 @@ var permissions;
 var publicRef;
 var privateRef;
 
+var imageDictionary = {};
+
 class User {
     constructor(uid, displayName, email, photoURL) {
         this.uid = uid;
@@ -98,7 +100,27 @@ function saveImage(image, file) {
     }
 }
 
-function displayImage(image, profile) {
+function display(uid) {
+    var image;
+    var profile;
+
+    console.log(imageDictionary);
+    
+    imageDictionary[uid].on("value", snapshot => {
+        image = snapshot[0].value;
+        profile = snapshot[1].value;
+    });
+
+    console.log(image);
+    console.log(profile);
+
+    // starCountRef.on('value', (snapshot) => {
+    //     const data = snapshot.val();
+    //     updateStarCount(postElement, data);
+    //   });
+
+
+
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
     console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner}`);
 
@@ -178,12 +200,19 @@ function displayImage(image, profile) {
 
 async function loadPrivateImages() { // TODO: needs to be paginated (also maybe we should somehow merge the code into one? as this is duplicate code)
     if (user) {
-        var images = [];
+       // var images = [];
         await db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
                 console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${doc.data().permission == user.uid}`);
-                images.push(doc.data());
+                var image = doc.data();
                 
+                imageDictionary[image.owner][0] = image;
+                
+                //images.push(doc.data());
+                
+
+
+
                 //displayImage(doc.data());
                 
                 
@@ -192,33 +221,34 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
             });
         });
 
-        console.info(`Loaded ${images.length} private image(s)`);
-        resolve(images);
+        // console.info(`Loaded ${images.length} private image(s)`);
+        // return images;
     } else {
         throw "User must be logged in to view private images!";
     }
 }
 
 async function loadPublicImages() { // TODO: needs to be paginated, also needs to only load the changes? we end up with duplicates displaying
-    var images = [];
+    //var images = [];
     await db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
             console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}`);
-            images.push(doc.data());
+            imageDictionary[image.owner][0] = image;
+            //images.push(doc.data());
             //displayImage(doc.data());
 
             //loadUser(doc.data().owner).then(profile => displayImage(doc.data(), profile));
         });
     });
 
-    console.info(`Loaded ${images.length} public image(s)`);
-    resolve(images);
+    // console.info(`Loaded ${images.length} public image(s)`);
+    // return images;
 }
 
 async function loadOwner(uid) {
     await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot(doc => {
         console.debug(`Loading ${doc.data().displayName}'s public profile`);
-        resolve(doc.data());
+        imageDictionary[uid][1] = doc.data();
     });
 }
 
@@ -242,21 +272,30 @@ function initialize() {
             user = result.user;
         }).catch(error => console.error(error.message));
     }
+    loadPublicImages();
 
-    loadPublicImages().then(images => images.forEach(image => {
-        console.debug(`Passing ${image.filename} to loadOwner()`);
-        loadOwner(image.owner).then(profile => {
-            console.debug(`Passing ${profile.displayName} and ${image.filename} to displayImage()`);
-            displayImage(image, profile);
-        });
-    }));
+
+
+    
+    // loadPublicImages().then(images => images.forEach(image => {
+    //     console.debug(`Passing ${image.filename} to loadOwner()`);
+    //     loadOwner(image.owner).then(profile => {
+    //         console.debug(`Passing ${profile.displayName} and ${image.filename} to displayImage()`);
+    //         displayImage(image, profile);
+    //     });
+    // }));
 
     
 
+
     
 
-
-
+//example code:
+    // var starCountRef = firebase.database().ref('posts/' + postId + '/starCount');
+    // starCountRef.on('value', (snapshot) => {
+    //   const data = snapshot.val();
+    //   updateStarCount(postElement, data);
+    // });
 
 
 
@@ -275,11 +314,13 @@ function initialize() {
                 PRIVATE: user.uid
             };
 
-            loadPrivateImages().then(images => images.forEach(image => {
-                loadOwner(image.owner).then(profile => {
-                    displayImage(image, profile);
-                });
-            }));
+            loadPrivateImages();
+
+            // loadPrivateImages().then(images => images.forEach(image => {
+            //     loadOwner(image.owner).then(profile => {
+            //         displayImage(image, profile);
+            //     });
+            // }));
         } else {
             document.getElementById("authBtn").textContent = "Login"
         }
