@@ -102,9 +102,10 @@ function saveImage(image, file) {
     }
 }
 
-function display(id) {
-    var image = imageDictionary[id];
-    var profile = userDictionary[id.slice(0, id.indexOf('_'))];
+function display(image, profile) {
+    var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
+    // var image = imageDictionary[id];
+    // var profile = userDictionary[id.slice(0, id.indexOf('_'))];
 
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
     console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner}, ID: ${id}`);
@@ -189,79 +190,21 @@ function clear(id) {
 
 async function loadPrivateImages() {
     if (user) {
-        await db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
+        db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
                 var image = doc.data();
                 var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
                 console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}, ID: ${id}`);
                 
                 if (!imageDictionary[id]) {
-                    loadOwner(id);
+                    loadOwner(image);
                 }
 
-                // changes.forEach(change => {
-                //     changes.delete(change);
-                // });
-                
                 imageDictionary[id] = image;
                 changes.add(id);
 
-                // for(var key in imageDictionary) { // TODO: it kinda works but we need to iterate through everything before we do this stuff
-                //     if (!changes.has(key)) {
-                //         console.debug(`ID ${key} is outdated`);
-                //         clear(key);
-                //     }
-                // }
-
-                // imageDictionary.forEach(image => {
-                //     if (!(image))
-                // });
-
-
-                // changes.forEach(change => {
-                //     if (!(change in imageDictionary)) {
-                //         console.debug(`ID ${change} not found in imageDictionary`);
-                //         clear(change);
-                //     }
-                // });
-
-
-
-                // changes.forEach(change => {
-                //     console.debug(`Previous ID: ${change}`);
-                //     if (!(change in imageDictionary)) {
-                //         console.debug(`ID ${change} not found in imageDictionary`);
-                //         clear(change);
-                //     }
-                // });
-
-                
+     
             });
-            
-            changes.forEach(change => {
-                console.debug(`Saved ID: ${change}`);
-                for(var key in imageDictionary) {
-                    console.debug(`Current ID: ${key}`);
-                }
-
-                if (!(change in imageDictionary)) {
-                    console.debug(`ID ${change} is outdated`);
-                    clear(change);
-                }
-            });
-
-
-
-            // for(var key in imageDictionary) { // TODO: it kinda works but we need to iterate through everything before we do this stuff
-            //     if (!changes.has(key)) {
-            //         console.debug(`ID ${key} is outdated`);
-            //         clear(key);
-            //     }
-            // }
-
-            // changes.forEach(change => {
-            //     changes.delete(change);
-            // });
         });
     } else {
         throw "User must be logged in to view private images!";
@@ -269,26 +212,27 @@ async function loadPrivateImages() {
 }
 
 async function loadPublicImages() {
-    await db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
+    db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
             var image = doc.data();
             var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
             console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, ID: ${id}`);
             if (!imageDictionary[id]) {
-                loadOwner(id);
+                loadOwner(image);
             }
             imageDictionary[id] = image;
         });
     });
 }
 
-async function loadOwner(id) {
-    var uid = id.slice(0, id.indexOf('_'));
+async function loadOwner(image) {
+    var uid = await image.owner;
+    var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
     await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot(doc => {
         var owner = doc.data();
         console.debug(`Loading ${owner.displayName}'s public profile`);
         userDictionary[uid] = owner;
-        display(id);
+        display(image, owner);
     });
 }
 
