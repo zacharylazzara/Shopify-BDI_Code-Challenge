@@ -130,7 +130,7 @@ function displayImage(image, profile) {
 
     cardImage.setAttribute("src", image.src);
     title.textContent = image.filename;
-    avatar.setAttribute("src", profile.photoURL);
+    //avatar.setAttribute("src", profile.photoURL);
     name.textContent = profile.displayName;
     small.textContent = profile.email;
     deleteBtn.textContent = "Delete";
@@ -199,7 +199,7 @@ async function loadPublicImages() { // TODO: needs to be paginated, also needs t
 }
 
 async function loadUser(uid) {
-    await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot({includeMetadataChanges: false}, doc => {
+    await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot(doc => {
         console.debug(`Loading ${doc.data().displayName}'s public profile`);
         return doc.data();
     });
