@@ -10,7 +10,7 @@ var permissions;
 var publicRef;
 var privateRef;
 
-var changes = [];
+let changes = new Set();
 var imageDictionary = {};
 var userDictionary = {};
 
@@ -182,7 +182,7 @@ function display(id) {
 
 function clear(id) {
     console.debug(`Clearing: ${id}`);
-    changes.pop(id);
+    changes.delete(id);
     item = document.getElementById(id);
     item.parentNode.removeChild(item);
 }
@@ -200,8 +200,7 @@ async function loadPrivateImages() {
                 }
 
                 imageDictionary[id] = image;
-                changes.push(id);
-
+                changes.add(id);
 
                 changes.forEach(change => {
                     console.debug(`Previous ID: ${change}`);
