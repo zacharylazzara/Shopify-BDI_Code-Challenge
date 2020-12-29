@@ -7,13 +7,13 @@ var storage = firebase.storage();
 var imagesRef = storage.ref("images")
 
 var publicRef = imagesRef.child("public");
-var privateRef; // Assigned in initialize()
+var privateRef = imagesRef.child(user ? user.uid : "orhpan");
 var privateImages = [];
 var publicImages = [];
 
 const permissions = {
     PUBLIC: "public",
-    PRIVATE: user ? user.uid : null
+    PRIVATE: user ? user.uid : "orphan"
 };
 
 class Image {
@@ -203,7 +203,6 @@ function initialize() {
 
     firebase.auth().onAuthStateChanged(() => {
         if (user) {
-            privateRef = imagesRef.child(user.uid);
             document.getElementById("authBtn").textContent = "Logout"
             displayPrivateImages();
         } else {
