@@ -106,14 +106,23 @@ function display(uid) {
     var profile;
 
     console.log(imageDictionary);
-    
-    imageDictionary[uid].on("value", snapshot => {
+
+
+    imageDictionary[uid].addEventListener("value", snapshot => {
         image = snapshot.value;
     });
 
-    userDictionary[uid].on("value", snapshot => {
+    userDictionary[uid].addEventListener("value", snapshot => {
         profile = snapshot.value;
     });
+    
+    // imageDictionary[uid].on("value", snapshot => {
+    //     image = snapshot.value;
+    // });
+
+    // userDictionary[uid].on("value", snapshot => {
+    //     profile = snapshot.value;
+    // });
 
     console.log(image);
     console.log(profile);
