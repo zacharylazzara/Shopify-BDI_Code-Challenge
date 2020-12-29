@@ -105,7 +105,7 @@ function deleteImage(image) {
 }
 
 function displayImage(image) {
-    console.debug(`Displaying Image: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${image.owner}`);
+    console.debug(`Displaying Image: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner UID: ${image.owner}`);
     var img = document.createElement("img");
     img.setAttribute("src", image.src);
     img.setAttribute("width", 100);
@@ -117,7 +117,7 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
         console.log(`Loading private images for ${user.displayName}...`);
         await db.collection(permissions.PRIVATE).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
-                console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}`);
+                console.debug(`Loading: ${image.filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}`);
                 displayImage(doc.data());
             });
         });
@@ -135,26 +135,6 @@ async function loadPublicImages() { // TODO: needs to be paginated, also the con
         });
     });
 }
-
-// function displayPrivateImages() {
-//     loadPrivateImages();
-//     privateImages.forEach(image => {
-//         console.debug(`Private image ${image.filename} belongs to ${user.displayName}: ${image.permission == user.uid}`);
-//         var img = document.createElement("img");
-//         img.setAttribute("src", image.src);
-//         document.getElementById("private").appendChild(img);
-//     });
-// }
-
-// function displayPublicImages() {
-//     loadPublicImages();
-//     publicImages.forEach(image => {
-//         console.debug(`Displaying public image ${image.filename}, permission: ${image.permission}, owner: ${image.owner}`);
-//         var img = document.createElement("img");
-//         img.setAttribute("src", image.src);
-//         document.getElementById("public").appendChild(img);
-//     });
-// }
 
 function initialize() {
     permissions = {
