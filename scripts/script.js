@@ -102,19 +102,20 @@ function saveImage(image, file) {
 }
 
 function display(uid) {
-    var image;
-    var profile;
+    var image = imageDictionary[uid];
+    var profile = userDictionary[uid];
 
     console.log(imageDictionary);
+    console.log(userDictionary);
 
 
-    imageDictionary[uid].addEventListener("value", snapshot => {
-        image = snapshot.value;
-    });
+    // imageDictionary[uid].addEventListener("value", snapshot => {
+    //     image = snapshot.value;
+    // });
 
-    userDictionary[uid].addEventListener("value", snapshot => {
-        profile = snapshot.value;
-    });
+    // userDictionary[uid].addEventListener("value", snapshot => {
+    //     profile = snapshot.value;
+    // });
     
     // imageDictionary[uid].on("value", snapshot => {
     //     image = snapshot.value;
