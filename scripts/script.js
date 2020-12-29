@@ -105,11 +105,12 @@ function deleteImage(image) {
 }
 
 function displayImage(image) {
-    console.debug(`Displaying Image: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner UID: ${image.owner ?? user ? user.uid : null}`);
+    var display = image.permission === permissions.PUBLIC ? "public" : "private";
+    console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner ?? user ? user.uid : null}`);
     var img = document.createElement("img");
     img.setAttribute("src", image.src);
     img.setAttribute("width", 100);
-    document.getElementById("private").appendChild(img);
+    document.getElementById(display).appendChild(img);
 }
 
 async function loadPrivateImages() { // TODO: needs to be paginated (also maybe we should somehow merge the code into one? as this is duplicate code)
