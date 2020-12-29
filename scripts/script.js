@@ -149,7 +149,8 @@ function displayImage(image) {
     card.appendChild(cardBody);
     cardBody.appendChild(title);
     cardBody.appendChild(document.createElement("hr"));
-    cardBody.appendChild(flex);
+    cardBody.appendChild(profile);
+    profile.appendChild(flex);
     flex.appendChild(avatar);
     flex.appendChild(document.createTextNode("\u00A0"));
     flex.appendChild(profileDetails);
