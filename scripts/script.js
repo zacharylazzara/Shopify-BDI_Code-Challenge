@@ -169,8 +169,7 @@ function display(id) {
                     db.collection(image.permission).doc(image.filename).delete().then(() => {
                         console.info("Successfully deleted");
                         delete imageDictionary[id];
-                        item = document.getElementById(`${image.permission}/${image.filename}`);
-                        item.parentNode.removeChild(item);
+                        clear(image);
                     });
                 });
             }
@@ -180,6 +179,11 @@ function display(id) {
     }
 }
 
+function clear(image) {
+    item = document.getElementById(`${image.permission}/${image.filename}`);
+    item.parentNode.removeChild(item);
+}
+
 async function loadPrivateImages() {
     if (user) {
         await db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
@@ -187,9 +191,11 @@ async function loadPrivateImages() {
                 var image = doc.data();
                 var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
                 console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}, ID: ${id}`);
-                if (!imageDictionary[id]) {
-                    loadOwner(id);
+                if (imageDictionary[id]) {
+                    clear(image);
                 }
+                loadOwner(id);
+                
                 imageDictionary[id] = image;
             });
         });
