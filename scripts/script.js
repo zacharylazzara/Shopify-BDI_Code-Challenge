@@ -195,6 +195,14 @@ async function loadPrivateImages() {
                 var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
                 console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}, ID: ${id}`);
                 
+                if (!imageDictionary[id]) {
+                    loadOwner(id);
+                }
+
+                imageDictionary[id] = image;
+                changes.push(id);
+
+
                 changes.forEach(change => {
                     console.debug(`Previous ID: ${change}`);
                     if (!(change in imageDictionary)) {
@@ -202,12 +210,7 @@ async function loadPrivateImages() {
                     }
                 });
 
-                if (!imageDictionary[id]) {
-                    loadOwner(id);
-                }
-
-                imageDictionary[id] = image;
-                changes.push(id);
+                
             });
         });
     } else {
