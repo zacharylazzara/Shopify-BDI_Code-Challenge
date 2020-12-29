@@ -10,6 +10,7 @@ var permissions;
 var publicRef;
 var privateRef;
 
+var changes = [];
 var imageDictionary = {};
 var userDictionary = {};
 
@@ -122,7 +123,7 @@ function display(id) {
     var deleteBtn = document.createElement("button");
 
     card.className = "card image-card";
-    card.id = `${image.permission}/${image.filename}`;
+    card.id = id;
     cardImage.className = "image card-img-top";
     cardBody.className = "card-body";
     title.className = "card-title";
@@ -132,7 +133,7 @@ function display(id) {
     name.className = "profile";
     email.className = "profile";
     deleteBtn.className = "btn btn-danger";
-    deleteBtn.id = `${image.permission}/${image.filename}`;
+    deleteBtn.id = id;
 
     cardImage.setAttribute("src", image.src);
     title.textContent = image.filename;
@@ -169,7 +170,7 @@ function display(id) {
                     db.collection(image.permission).doc(image.filename).delete().then(() => {
                         console.info("Successfully deleted");
                         delete imageDictionary[id];
-                        clear(image);
+                        clear(id);
                     });
                 });
             }
@@ -179,8 +180,9 @@ function display(id) {
     }
 }
 
-function clear(image) {
-    item = document.getElementById(`${image.permission}/${image.filename}`);
+function clear(id) {
+    changes.pop(id);
+    item = document.getElementById(id);
     item.parentNode.removeChild(item);
 }
 
@@ -191,12 +193,18 @@ async function loadPrivateImages() {
                 var image = doc.data();
                 var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
                 console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}, ID: ${id}`);
-                if (imageDictionary[id]) {
-                    clear(image);
+                if (!imageDictionary[id]) {
+                    loadOwner(id);
                 }
                 
-                loadOwner(id);
                 imageDictionary[id] = image;
+                changes.push(id);
+
+                changes.forEach(change => {
+                    if (!(change in imageDictionary)) {
+                        clear(change);
+                    }
+                });
             });
         });
     } else {
@@ -210,11 +218,9 @@ async function loadPublicImages() {
             var image = doc.data();
             var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
             console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, ID: ${id}`);
-            if (imageDictionary[id]) {
-                clear(image);
+            if (!imageDictionary[id]) {
+                loadOwner(id);
             }
-
-            loadOwner(id);
             imageDictionary[id] = image;
         });
     });
@@ -252,28 +258,6 @@ function initialize() {
     }
 
     loadPublicImages();
-
-
-
-
-    
-    // loadPublicImages().then(images => images.forEach(image => {
-    //     console.debug(`Passing ${image.filename} to loadOwner()`);
-    //     loadOwner(image.owner).then(profile => {
-    //         console.debug(`Passing ${profile.displayName} and ${image.filename} to displayImage()`);
-    //         displayImage(image, profile);
-    //     });
-    // }));
-
-    
-
-
-    
-
-
-
-
-
 
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
