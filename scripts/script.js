@@ -203,16 +203,27 @@ async function loadPrivateImages() {
                     changes.delete(change);
                 });
                 
-
                 imageDictionary[id] = image;
                 changes.add(id);
 
-                changes.forEach(change => {
-                    if (!(change in imageDictionary)) {
-                        console.debug(`ID ${change} not found in imageDictionary`);
-                        clear(change);
+                for(var key in imageDictionary) {
+                    if (!change.has(key)) {
+                        console.debug(`ID ${key} is outdated`);
+                        clear(key);
                     }
-                });
+                }
+
+                // imageDictionary.forEach(image => {
+                //     if (!(image))
+                // });
+
+
+                // changes.forEach(change => {
+                //     if (!(change in imageDictionary)) {
+                //         console.debug(`ID ${change} not found in imageDictionary`);
+                //         clear(change);
+                //     }
+                // });
 
 
 
