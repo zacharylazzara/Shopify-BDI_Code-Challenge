@@ -105,7 +105,7 @@ function deleteImage(image) {
 }
 
 function displayImage(image) {
-    console.debug(`Displaying Image: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner UID: ${image.owner}`);
+    console.debug(`Displaying Image: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner UID: ${image.owner ?? user ? user.uid : null}`);
     var img = document.createElement("img");
     img.setAttribute("src", image.src);
     img.setAttribute("width", 100);
