@@ -105,7 +105,7 @@ function deleteImage(image) {
 }
 
 function displayImage(image) {
-    console.debug(`Displaying image ${image.filename}, permission: ${image.permission}, owner: ${image.owner}`);
+    console.debug(`Displaying Image: ${image.filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}, Owner: ${image.owner}`);
     var img = document.createElement("img");
     img.setAttribute("src", image.src);
     img.setAttribute("width", 100);
@@ -117,7 +117,7 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
         console.log(`Loading private images for ${user.displayName}...`);
         await db.collection(permissions.PRIVATE).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
-                console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == user.uid ? "private" : "public"}`);
+                console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}`);
                 displayImage(doc.data());
             });
         });
@@ -130,7 +130,7 @@ async function loadPublicImages() { // TODO: needs to be paginated, also the con
     console.log("Loading public images...");
     await db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
-            console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == user.uid ? "private" : "public"}`);
+            console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}`);
             displayImage(doc.data());
         });
     });
