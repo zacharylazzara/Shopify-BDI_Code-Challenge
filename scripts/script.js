@@ -249,11 +249,7 @@ function initialize() {
         });
     }));
 
-    loadPrivateImages().then(images => images.forEach(image => {
-        loadOwner(image.owner).then(profile => {
-            displayImage(image, profile);
-        });
-    }));
+    
 
     
 
@@ -277,7 +273,11 @@ function initialize() {
                 PRIVATE: user.uid
             };
 
-            loadPrivateImages();
+            loadPrivateImages().then(images => images.forEach(image => {
+                loadOwner(image.owner).then(profile => {
+                    displayImage(image, profile);
+                });
+            }));
         } else {
             document.getElementById("authBtn").textContent = "Login"
         }
