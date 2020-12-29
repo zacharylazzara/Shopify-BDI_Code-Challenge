@@ -175,12 +175,6 @@ function displayImage(image) {
                 //         </div>
                 //     </div>
                 // </div>
-
-
-    var img = document.createElement("img");
-    img.setAttribute("src", image.src);
-    img.setAttribute("width", 100);
-    document.getElementById(display).appendChild(img);
 }
 
 async function loadPrivateImages() { // TODO: needs to be paginated (also maybe we should somehow merge the code into one? as this is duplicate code)
