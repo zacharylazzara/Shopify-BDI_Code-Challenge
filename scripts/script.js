@@ -170,7 +170,7 @@ function display(id) {
                     db.collection(image.permission).doc(image.filename).delete().then(() => {
                         console.info(`Successfully Deleted: ${id}`);
                         delete imageDictionary[id];
-                        //clear(id);
+                        clear(id);
                     });
                 });
             }
@@ -237,10 +237,11 @@ async function loadPrivateImages() {
 
                 
             });
+            
             changes.forEach(change => {
                 console.debug(`Saved ID: ${change}`);
                 for(var key in imageDictionary) {
-                    console.debug(`Current IDs: ${key}`);
+                    console.debug(`Current ID: ${key}`);
                 }
 
                 if (!(change in imageDictionary)) {
