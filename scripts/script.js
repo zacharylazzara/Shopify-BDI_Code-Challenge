@@ -187,8 +187,11 @@ async function loadPrivateImages() {
                 var image = doc.data();
                 console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}`);
                 var id = `${image.owner}_${image.permission}${image.name}`;
+                if (!imageDictionary[id]) {
+                    loadOwner(id);
+                }
+
                 imageDictionary[id] = image;
-                loadOwner(id);
             });
         });
     } else {
@@ -202,8 +205,10 @@ async function loadPublicImages() {
             var image = doc.data();
             console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}`);
             var id = `${image.owner}_${image.permission}${image.name}`;
+            if (!imageDictionary[id]) {
+                loadOwner(id);
+            }
             imageDictionary[id] = image;
-            loadOwner(id);
         });
     });
 }
