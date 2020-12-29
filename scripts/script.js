@@ -194,19 +194,20 @@ async function loadPrivateImages() {
                 var image = doc.data();
                 var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
                 console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}, ID: ${id}`);
+                
+                changes.forEach(change => {
+                    console.debug(`Previous ID: ${change}`);
+                    if (!(change in imageDictionary)) {
+                        clear(change);
+                    }
+                });
+
                 if (!imageDictionary[id]) {
                     loadOwner(id);
                 }
 
                 imageDictionary[id] = image;
                 changes.push(id);
-
-                changes.forEach(change => {
-                    console.debug(`Previous IDs: ${change}`);
-                    if (!(change in imageDictionary)) {
-                        clear(change);
-                    }
-                });
             });
         });
     } else {
