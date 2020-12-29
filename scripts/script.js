@@ -216,7 +216,7 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
                 var image = doc.data();
                 console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}`);
                 imageDictionary[image.owner] = image;
-                display(image.owner);
+                loadOwner(image.owner);
                 //images.push(doc.data());
                 
 
@@ -244,7 +244,7 @@ async function loadPublicImages() { // TODO: needs to be paginated, also needs t
             var image = doc.data();
             console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}`);
             imageDictionary[image.owner] = image;
-            display(image.owner);
+            loadOwner(image.owner);
 
             //images.push(doc.data());
             //displayImage(doc.data());
@@ -262,6 +262,7 @@ async function loadOwner(uid) {
         var owner = doc.data();
         console.debug(`Loading ${owner.displayName}'s public profile`);
         userDictionary[uid] = owner;
+        display(uid);
     });
 }
 
