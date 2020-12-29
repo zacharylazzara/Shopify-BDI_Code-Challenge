@@ -191,7 +191,7 @@ async function loadPrivateImages() { // TODO: needs to be paginated (also maybe 
         await db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
                 console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${doc.data().permission == user.uid}`);
-                displayImage(doc.data(), loadUser(doc.data().owner));
+                loadUser(doc.data().owner).then(profile => displayImage(doc.data(), profile));
             });
         });
     } else {
@@ -203,7 +203,7 @@ async function loadPublicImages() { // TODO: needs to be paginated, also the con
     await db.collection(permissions.PUBLIC).withConverter(imageConverter).onSnapshot(snapshot => {
         snapshot.forEach(doc => {
             console.debug(`Loading: ${doc.data().filename}, Type: ${doc.data().permission == "public" ? "public" : "private"}`);
-            displayImage(doc.data(), loadUser(doc.data().owner));
+            loadUser(doc.data().owner).then(profile => displayImage(doc.data(), profile));
         });
     });
 }
