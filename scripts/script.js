@@ -115,7 +115,7 @@ function displayImage(image) {
     var profile = document.createElement("div");
     var flex = document.createElement("div");
     var avatar = document.createElement("img");
-    var nbsp = document.createElement("p");
+    //var nbsp = document.createElement("p");
     var profileDetails = document.createElement("div");
     var name = document.createElement("h6");
     var email = document.createElement("h6");
@@ -138,7 +138,7 @@ function displayImage(image) {
     title.textContent = image.filename;
     // TODO: these need to load from a different collection for each user (we use the owner UID from the image to find it; if owner UID is null we use the logged in user's info)
     avatar.setAttribute("src", user.photoURL);
-    nbsp.createTextNode("\s\s");
+    //nbsp.createTextNode("\s\s");
     name.textContent = user.displayName;
     small.textContent = user.email;
     //////////////
@@ -151,7 +151,7 @@ function displayImage(image) {
     cardBody.appendChild(document.createElement("hr"));
     cardBody.appendChild(flex);
     flex.appendChild(avatar);
-    flex.appendChild(nbsp);
+    flex.appendChild(document.createTextNode("\s\s"));
     flex.appendChild(profileDetails);
     profileDetails.appendChild(name);
     profileDetails.appendChild(email);
