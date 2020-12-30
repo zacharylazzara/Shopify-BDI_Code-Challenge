@@ -198,70 +198,9 @@ async function loadPrivateImages() {
                 if (!imageDictionary[id]) {
                     loadOwner(id);
                 }
-
-                // changes.forEach(change => {
-                //     changes.delete(change);
-                // });
                 
                 imageDictionary[id] = image;
-                //changes.add(id);
-
-                // for(var key in imageDictionary) { // TODO: it kinda works but we need to iterate through everything before we do this stuff
-                //     if (!changes.has(key)) {
-                //         console.debug(`ID ${key} is outdated`);
-                //         clear(key);
-                //     }
-                // }
-
-                // imageDictionary.forEach(image => {
-                //     if (!(image))
-                // });
-
-
-                // changes.forEach(change => {
-                //     if (!(change in imageDictionary)) {
-                //         console.debug(`ID ${change} not found in imageDictionary`);
-                //         clear(change);
-                //     }
-                // });
-
-
-
-                // changes.forEach(change => {
-                //     console.debug(`Previous ID: ${change}`);
-                //     if (!(change in imageDictionary)) {
-                //         console.debug(`ID ${change} not found in imageDictionary`);
-                //         clear(change);
-                //     }
-                // });
-
-                
             });
-            
-            // changes.forEach(change => {
-            //     console.debug(`Saved ID: ${change}`);
-            //     for(var key in imageDictionary) {
-            //         console.debug(`Current ID: ${key}`);
-            //     }
-
-            //     if (!(change in imageDictionary)) {
-            //         console.debug(`ID ${change} is outdated`);
-            //         clear(change);
-            //     }
-            // });
-
-
-
-            // for(var key in imageDictionary) { // TODO: it kinda works but we need to iterate through everything before we do this stuff
-            //     if (!changes.has(key)) {
-            //         console.debug(`ID ${key} is outdated`);
-            //         clear(key);
-            //     }
-            // }
-
-            // changes.forEach(change => {
-            //     changes.delete(change);
-            // });
         });
     } else {
         throw "User must be logged in to view private images!";
@@ -313,7 +252,7 @@ function initialize() {
         }).catch(error => console.error(error.message));
     }
 
-    loadPublicImages();
+    loadPublicImages().catch(error => console.error(error.message));
 
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
@@ -327,7 +266,7 @@ function initialize() {
                 PRIVATE: user.uid
             };
 
-            loadPrivateImages();
+            loadPrivateImages().catch(error => console.error(error.message));
 
         } else {
             document.getElementById("authBtn").textContent = "Login"
