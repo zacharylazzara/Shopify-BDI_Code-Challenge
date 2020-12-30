@@ -10,12 +10,6 @@ var permissions;
 var publicRef;
 var privateRef;
 
-let outdatedIDs = new Set();
-
-let changes = new Set();
-var imageDictionary = {};
-var userDictionary = {};
-
 class User {
     constructor(uid, displayName, email, photoURL) {
         this.uid = uid;
@@ -106,8 +100,6 @@ function saveImage(image, file) {
 
 function display(image, profile) {
     var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
-    // var image = imageDictionary[id];
-    // var profile = userDictionary[id.slice(0, id.indexOf('_'))];
 
     var display = image.permission === permissions.PUBLIC ? "public" : "private";
     console.debug(`Displaying Image: ${image.filename}, Type: ${display}, Owner UID: ${image.owner}, ID: ${id}`);
@@ -160,7 +152,7 @@ function display(image, profile) {
     email.appendChild(small);
     profileContainer.appendChild(deleteBtn);
 
-    deleteBtn.onclick = function() { // TODO: we get a warning about the time the click handler takes; should probably make it run on a separate thread later
+    deleteBtn.onclick = function() {
         if (user) {
             if (confirm(`Delete ${image.filename}?`)) {
                 var deleteRef = privateRef.child(image.filename);
@@ -173,7 +165,7 @@ function display(image, profile) {
                     db.collection(image.permission).doc(image.filename).delete().then(() => {
                         console.info(`Successfully Deleted: ${id}`);
                         delete imageDictionary[id];
-                        //clear(id);
+                        clear(id);
                     });
                 });
             }
@@ -185,7 +177,6 @@ function display(image, profile) {
 
 function clear(id) {
     console.debug(`Clearing: ${id}`);
-    outdatedIDs.delete(id);
     changes.delete(id);
     item = document.getElementById(id);
     item.parentNode.removeChild(item);
@@ -193,7 +184,7 @@ function clear(id) {
 
 async function loadPrivateImages() {
     if (user) {
-        let currentIDs = new Set();
+        var currentIDs = new Set();
 
         db.collection(permissions.PRIVATE).withConverter(imageConverter).onSnapshot(snapshot => {
             snapshot.forEach(doc => {
@@ -201,32 +192,12 @@ async function loadPrivateImages() {
                 var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
                 console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}, ID: ${id}`);
                 
-                if (!currentIDs[id]) {
+                if (!current[id]) {
+                    currentIDs.add(id);
                     loadOwner(image);
                 }
-
-                currentIDs.add(id);
-                outdatedIDs.add(id);
-
-                
-               // outdatedIDs.add();
-
-                // imageDictionary[id] = image;
-                // changes.add(id);
-
-     
             });
         });
-
-        outdatedIDs.forEach(outdated => {
-            if (!(outdated in currentIDs)) {
-                clear(outdated);
-            }
-        });
-
-
-
-
     } else {
         throw "User must be logged in to view private images!";
     }
