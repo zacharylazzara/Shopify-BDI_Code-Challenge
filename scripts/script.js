@@ -164,7 +164,6 @@ function display(image, profile) {
                 deleteRef.delete().then(() => {
                     db.collection(image.permission).doc(image.filename).delete().then(() => {
                         console.info(`Successfully Deleted: ${id}`);
-                        delete imageDictionary[id];
                         clear(id);
                     });
                 });
@@ -177,7 +176,6 @@ function display(image, profile) {
 
 function clear(id) {
     console.debug(`Clearing: ${id}`);
-    changes.delete(id);
     item = document.getElementById(id);
     item.parentNode.removeChild(item);
 }
