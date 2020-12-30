@@ -223,7 +223,6 @@ async function loadOwner(image) {
     await db.collection("users").doc(uid).withConverter(userConverter).onSnapshot(doc => {
         var owner = doc.data();
         console.debug(`Loading ${owner.displayName}'s public profile`);
-        userDictionary[uid] = owner;
         display(image, owner);
     });
 }
