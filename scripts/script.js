@@ -192,7 +192,7 @@ async function loadPrivateImages() {
                 var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
                 console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, Owner: ${user.displayName}, ${image.permission == user.uid}, ID: ${id}`);
                 
-                if (!current[id]) {
+                if (!currentIDs[id]) {
                     currentIDs.add(id);
                     loadOwner(image);
                 }
