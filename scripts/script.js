@@ -155,7 +155,10 @@ function display(id) {
     profileDetails.appendChild(name);
     profileDetails.appendChild(email);
     email.appendChild(small);
-    profileContainer.appendChild(deleteBtn);
+
+    if (user && user.uid == image.owner) {
+        profileContainer.appendChild(deleteBtn);
+    }
 
     deleteBtn.onclick = function() {
         if (user) {
