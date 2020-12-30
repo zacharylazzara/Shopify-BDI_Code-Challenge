@@ -201,7 +201,7 @@ async function loadPrivateImages() {
                 
                 imageDictionary[id] = image;
             });
-        }).catch(error => console.error(error.message));
+        });
     } else {
         throw "User must be logged in to view private images!";
     }
@@ -214,11 +214,11 @@ async function loadPublicImages() {
             var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
             console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, ID: ${id}`);
             if (!imageDictionary[id]) {
-                loadOwner(id).catch(error => console.error(error.message));
+                loadOwner(id);
             }
             imageDictionary[id] = image;
         });
-    }).catch(error => console.error(error.message));
+    });
 }
 
 async function loadOwner(id) {
@@ -228,7 +228,7 @@ async function loadOwner(id) {
         console.debug(`Loading ${owner.displayName}'s public profile`);
         userDictionary[uid] = owner;
         display(id);
-    }).catch(error => console.error(error.message));
+    });
 }
 
 function saveUser() {
