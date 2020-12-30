@@ -157,7 +157,7 @@ function display(id) {
     email.appendChild(small);
     profileContainer.appendChild(deleteBtn);
 
-    deleteBtn.onclick = function() { // TODO: we get a warning about the time the click handler takes; should probably make it run on a separate thread later
+    deleteBtn.onclick = function() {
         if (user) {
             if (confirm(`Delete ${image.filename}?`)) {
                 var deleteRef = privateRef.child(image.filename);
@@ -201,7 +201,7 @@ async function loadPrivateImages() {
                 
                 imageDictionary[id] = image;
             });
-        });
+        }).catch(error => console.error(error.message));
     } else {
         throw "User must be logged in to view private images!";
     }
@@ -214,11 +214,11 @@ async function loadPublicImages() {
             var id = `${image.owner}_${image.permission == "public" ? "public" : "private"}:${image.filename}`;
             console.debug(`Loading: ${image.filename}, Type: ${image.permission == "public" ? "public" : "private"}, ID: ${id}`);
             if (!imageDictionary[id]) {
-                loadOwner(id);
+                loadOwner(id).catch(error => console.error(error.message));
             }
             imageDictionary[id] = image;
         });
-    });
+    }).catch(error => console.error(error.message));
 }
 
 async function loadOwner(id) {
@@ -228,7 +228,7 @@ async function loadOwner(id) {
         console.debug(`Loading ${owner.displayName}'s public profile`);
         userDictionary[uid] = owner;
         display(id);
-    });
+    }).catch(error => console.error(error.message));
 }
 
 function saveUser() {
@@ -252,7 +252,7 @@ function initialize() {
         }).catch(error => console.error(error.message));
     }
 
-    loadPublicImages().catch(error => console.error(error.message));
+    loadPublicImages();
 
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
@@ -266,7 +266,7 @@ function initialize() {
                 PRIVATE: user.uid
             };
 
-            loadPrivateImages().catch(error => console.error(error.message));
+            loadPrivateImages();
 
         } else {
             document.getElementById("authBtn").textContent = "Login"
