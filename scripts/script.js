@@ -204,7 +204,7 @@ async function loadPrivateImages() {
                 // });
                 
                 imageDictionary[id] = image;
-                changes.add(id);
+                //changes.add(id);
 
                 // for(var key in imageDictionary) { // TODO: it kinda works but we need to iterate through everything before we do this stuff
                 //     if (!changes.has(key)) {
@@ -238,17 +238,17 @@ async function loadPrivateImages() {
                 
             });
             
-            changes.forEach(change => {
-                console.debug(`Saved ID: ${change}`);
-                for(var key in imageDictionary) {
-                    console.debug(`Current ID: ${key}`);
-                }
+            // changes.forEach(change => {
+            //     console.debug(`Saved ID: ${change}`);
+            //     for(var key in imageDictionary) {
+            //         console.debug(`Current ID: ${key}`);
+            //     }
 
-                if (!(change in imageDictionary)) {
-                    console.debug(`ID ${change} is outdated`);
-                    clear(change);
-                }
-            });
+            //     if (!(change in imageDictionary)) {
+            //         console.debug(`ID ${change} is outdated`);
+            //         clear(change);
+            //     }
+            // });
 
 
 
